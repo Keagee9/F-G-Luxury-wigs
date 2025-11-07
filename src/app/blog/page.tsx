@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { blogPosts } from '@/lib/data';
 import { Card, CardContent } from '@/components/ui/card';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
+import PlaceHolderImages from '@/lib/placeholder-images.json';
 import { ArrowRight } from 'lucide-react';
 
 export default function BlogPage() {

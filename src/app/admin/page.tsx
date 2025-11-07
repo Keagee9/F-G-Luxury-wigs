@@ -22,11 +22,13 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { wigs as initialWigs } from '@/lib/data';
 import type { Wig } from '@/lib/types';
-import { PlusCircle, Edit, DollarSign, Upload } from 'lucide-react';
+import { PlusCircle, Edit, DollarSign, Upload, X } from 'lucide-react';
+import Image from 'next/image';
 
 export default function AdminPage() {
   const [wigs, setWigs] = useState<Wig[]>(initialWigs);
   const [editingWig, setEditingWig] = useState<Wig | null>(null);
+  const [newWigImages, setNewWigImages] = useState<string[]>([]);
 
   const handleUpdatePrice = (wigId: string, newPrice: number) => {
     setWigs(
@@ -34,6 +36,20 @@ export default function AdminPage() {
         wig.id === wigId ? { ...wig, price: newPrice } : wig
       )
     );
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const files = Array.from(e.target.files);
+      const imageUrls = files.map(file => URL.createObjectURL(file));
+      setNewWigImages(prev => [...prev, ...imageUrls]);
+    }
+  };
+
+  const handleRemoveImage = (imageUrl: string) => {
+    setNewWigImages(prev => prev.filter(url => url !== imageUrl));
+    // Revoke the object URL to free up memory
+    URL.revokeObjectURL(imageUrl);
   };
 
   return (
@@ -81,13 +97,30 @@ export default function AdminPage() {
               </div>
                <div className="space-y-2">
                 <Label htmlFor="images">Product Images</Label>
-                 <div className="relative flex justify-center items-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-secondary transition-colors">
-                    <Input id="images" type="file" className="sr-only" multiple accept="image/*"/>
+                 <div className="relative flex justify-center items-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-secondary transition-colors" onClick={() => document.getElementById('images-upload')?.click()}>
+                    <Input id="images-upload" type="file" className="sr-only" multiple accept="image/*" onChange={handleImageUpload}/>
                     <div className="text-center text-muted-foreground">
                       <Upload className="mx-auto h-8 w-8" />
                       <p className="mt-2 text-sm">Click or drag to upload</p>
                     </div>
                 </div>
+                 {newWigImages.length > 0 && (
+                  <div className="grid grid-cols-3 gap-2 mt-2">
+                    {newWigImages.map((url, index) => (
+                      <div key={index} className="relative aspect-square">
+                        <Image src={url} alt={`New wig image ${index + 1}`} fill className="object-cover rounded-md" />
+                        <Button
+                          size="icon"
+                          variant="destructive"
+                          className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                          onClick={() => handleRemoveImage(url)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
               <Button className="w-full">
                 <PlusCircle className="mr-2" /> Add Product

@@ -1,3 +1,110 @@
-{
-  "placeholderImages": []
-}
+[
+  {
+    "id": "hero-1",
+    "description": "Elegant woman with flowing dark hair looking over her shoulder.",
+    "imageUrl": "https://picsum.photos/seed/1/1800/1200",
+    "imageHint": "woman fashion"
+  },
+  {
+    "id": "wig-1",
+    "description": "Front view of a sleek black bob wig on a mannequin.",
+    "imageUrl": "https://picsum.photos/seed/101/600/600",
+    "imageHint": "black bob"
+  },
+  {
+    "id": "wig-2",
+    "description": "Side view of a sleek black bob wig showing the sharp cut.",
+    "imageUrl": "https://picsum.photos/seed/102/600/600",
+    "imageHint": "black wig"
+  },
+  {
+    "id": "wig-3",
+    "description": "Front view of a long wavy wig with sunset balayage colors.",
+    "imageUrl": "https://picsum.photos/seed/103/600/600",
+    "imageHint": "blonde wig"
+  },
+  {
+    "id": "wig-4",
+    "description": "Back view of a long wavy wig showcasing the balayage.",
+    "imageUrl": "https://picsum.photos/seed/104/600/600",
+    "imageHint": "wavy hair"
+  },
+  {
+    "id": "wig-5",
+    "description": "Voluminous curly red wig on a mannequin.",
+    "imageUrl": "https://picsum.photos/seed/105/600/600",
+    "imageHint": "red curly"
+  },
+  {
+    "id": "wig-6",
+    "description": "Close-up of the texture of the curly red wig.",
+    "imageUrl": "https://picsum.photos/seed/106/600/600",
+    "imageHint": "red hair"
+  },
+  {
+    "id": "wig-7",
+    "description": "Chic platinum blonde pixie cut wig.",
+    "imageUrl": "https://picsum.photos/seed/107/600/600",
+    "imageHint": "blonde pixie"
+  },
+  {
+    "id": "wig-8",
+    "description": "Side profile of the platinum blonde pixie wig.",
+    "imageUrl": "https://picsum.photos/seed/108/600/600",
+    "imageHint": "short hair"
+  },
+  {
+    "id": "wig-9",
+    "description": "Very long, straight jet black wig.",
+    "imageUrl": "https://picsum.photos/seed/109/600/600",
+    "imageHint": "long black"
+  },
+  {
+    "id": "wig-10",
+    "description": "A model wearing the long straight jet black wig.",
+    "imageUrl": "https://picsum.photos/seed/110/600/600",
+    "imageHint": "woman model"
+  },
+  {
+    "id": "wig-11",
+    "description": "Wavy wig with caramel highlights on a mannequin.",
+    "imageUrl": "https://picsum.photos/seed/111/600/600",
+    "imageHint": "caramel hair"
+  },
+  {
+    "id": "wig-12",
+    "description": "Model showing off the layers of the caramel highlight wig.",
+    "imageUrl": "https://picsum.photos/seed/112/600/600",
+    "imageHint": "wavy highlights"
+  },
+  {
+    "id": "blog-1",
+    "description": "A collection of wig care products on a clean background.",
+    "imageUrl": "https://picsum.photos/seed/201/600/400",
+    "imageHint": "hair products"
+  },
+  {
+    "id": "blog-2",
+    "description": "Silhouettes of different face shapes.",
+    "imageUrl": "https://picsum.photos/seed/202/600/400",
+    "imageHint": "face shapes"
+  },
+  {
+    "id": "avatar-1",
+    "description": "Portrait of a smiling woman.",
+    "imageUrl": "https://picsum.photos/seed/301/100/100",
+    "imageHint": "woman portrait"
+  },
+  {
+    "id": "avatar-2",
+    "description": "Portrait of a woman.",
+    "imageUrl": "https://picsum.photos/seed/302/100/100",
+    "imageHint": "woman face"
+  },
+  {
+    "id": "avatar-3",
+    "description": "Headshot of a smiling person.",
+    "imageUrl": "https://picsum.photos/seed/303/100/100",
+    "imageHint": "person smiling"
+  }
+]

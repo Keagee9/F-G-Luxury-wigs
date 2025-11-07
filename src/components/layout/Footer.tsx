@@ -20,7 +20,7 @@ export function Footer() {
              <Link href="/" className="flex items-center space-x-2 mb-4">
                 <Logo />
                 <span className="font-bold font-headline text-lg">
-                F&G Luxury
+                F&G Luxury wigs
                 </span>
             </Link>
             <p className="text-muted-foreground text-sm">
@@ -58,7 +58,7 @@ export function Footer() {
         </div>
 
         <div className="mt-12 pt-8 border-t flex flex-col sm:flex-row justify-between items-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} F&G Luxury. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} F&G Luxury wigs. All rights reserved.</p>
           <div className="flex space-x-4 mt-4 sm:mt-0">
             <SocialIcon>
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>

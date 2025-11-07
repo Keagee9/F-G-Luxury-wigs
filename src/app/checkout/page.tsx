@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { wigs } from '@/lib/data';
 import Image from 'next/image';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
+import PlaceHolderImages from '@/lib/placeholder-images.json';
 import { Lock } from 'lucide-react';
 
 const cartItems = [

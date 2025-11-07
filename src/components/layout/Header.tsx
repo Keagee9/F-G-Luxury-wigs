@@ -44,7 +44,7 @@ export function Header() {
           <Link href="/" className="mr-6 flex items-center space-x-2">
             <Logo />
             <span className="hidden font-bold sm:inline-block font-headline text-lg">
-              Luxe Locks Boutique
+              F&G Luxury
             </span>
           </Link>
           <nav className="flex items-center space-x-6 text-sm font-medium">
@@ -67,7 +67,7 @@ export function Header() {
               <Link href="/" className="flex items-center space-x-2 mb-6">
                 <Logo />
                 <span className="font-bold font-headline text-lg">
-                  Luxe Locks Boutique
+                  F&G Luxury
                 </span>
               </Link>
               <nav className="flex flex-col space-y-4">

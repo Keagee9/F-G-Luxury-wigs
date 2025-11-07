@@ -5,7 +5,7 @@ import { Footer } from '@/components/layout/Footer';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Luxe Locks Boutique',
+  title: 'F&G Luxury',
   description:
     'Discover a wide variety of high-quality human hair wigs. Try on styles virtually and get personalized recommendations.',
   icons: {

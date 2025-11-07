@@ -44,7 +44,7 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
 
       <footer className="text-center">
           <p className="text-muted-foreground">Thank you for reading!</p>
-          <p className="font-headline text-lg mt-2">Luxe Locks Boutique</p>
+          <p className="font-headline text-lg mt-2">F&G Luxury</p>
       </footer>
     </article>
   );

@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState } from 'react';
@@ -72,7 +73,8 @@ export default function CheckoutPage() {
     const handleConfirmPurchase = (e: React.FormEvent) => {
         e.preventDefault();
         if (receipt) {
-            const message = `New Purchase:%0A%0A*Name:* ${shippingDetails.firstName} ${shippingDetails.lastName}%0A*Email:* ${shippingDetails.email}%0A*Phone:* ${shippingDetails.phone}%0A*Address:* ${shippingDetails.address}, ${shippingDetails.city}, ${shippingDetails.state} ${shippingDetails.zip}%0A*Total:* $${total.toFixed(2)}`;
+            const productNames = cartItems.map(item => `${item.name} (x${item.quantity})`).join(', ');
+            const message = `New Purchase from F&G Luxury wigs:%0A%0A*Name:* ${shippingDetails.firstName} ${shippingDetails.lastName}%0A*Email:* ${shippingDetails.email}%0A*Phone:* ${shippingDetails.phone}%0A*Address:* ${shippingDetails.address}, ${shippingDetails.city}, ${shippingDetails.state} ${shippingDetails.zip}%0A*Products:* ${productNames}%0A*Total:* $${total.toFixed(2)}`;
             const whatsappUrl = `https://wa.me/13234718770?text=${message}`;
             window.open(whatsappUrl, '_blank');
             setStep('confirmed');

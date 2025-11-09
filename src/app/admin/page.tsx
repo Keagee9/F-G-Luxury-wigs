@@ -29,13 +29,17 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
-import { wigs as initialWigs } from '@/lib/data';
 import type { Wig } from '@/lib/types';
 import { PlusCircle, Edit, Trash2, DollarSign, Upload, X } from 'lucide-react';
 import Image from 'next/image';
+import { useCollection, useFirestore, useMemoFirebase, addDocumentNonBlocking, updateDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase';
+import { collection, doc } from 'firebase/firestore';
 
 export default function AdminPage() {
-  const [wigs, setWigs] = useState<Wig[]>(initialWigs);
+  const firestore = useFirestore();
+  const productsCollectionRef = useMemoFirebase(() => firestore ? collection(firestore, 'products') : null, [firestore]);
+  const { data: wigs, isLoading } = useCollection<Wig>(productsCollectionRef);
+
   const [isEditing, setIsEditing] = useState(false);
   const [currentWig, setCurrentWig] = useState<Wig | null>(null);
   
@@ -44,15 +48,12 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (currentWig) {
-      // For simplicity, we'll just use the first imageId if it exists
-      // In a real app, you'd fetch the full image objects
-      const imageUrl = currentWig.imageIds[0] ? `https://picsum.photos/seed/${currentWig.imageIds[0]}/600/600` : '';
-      setEditingImages(imageUrl ? [imageUrl] : []);
+      const imageUrls = currentWig.imageIds?.map(id => `https://picsum.photos/seed/${id}/600/600`) || [];
+      setEditingImages(imageUrls);
     } else {
       setEditingImages([]);
     }
   }, [currentWig]);
-
 
   const handleEditClick = (wig: Wig) => {
     setCurrentWig({ ...wig });
@@ -60,14 +61,20 @@ export default function AdminPage() {
   };
 
   const handleUpdateWig = () => {
-    if (!currentWig) return;
-    setWigs(wigs.map((wig) => (wig.id === currentWig.id ? currentWig : wig)));
+    if (!currentWig || !firestore) return;
+    const wigRef = doc(firestore, 'products', currentWig.id);
+    // This assumes editingImages contains URLs that can be parsed for seed IDs.
+    // In a real app, you would handle file uploads and get new image URLs.
+    const updatedImageIds = editingImages.map(url => url.split('/')[4]);
+    updateDocumentNonBlocking(wigRef, { ...currentWig, imageIds: updatedImageIds });
     setIsEditing(false);
     setCurrentWig(null);
   };
   
   const handleDeleteWig = (wigId: string) => {
-    setWigs(wigs.filter((wig) => wig.id !== wigId));
+    if (!firestore) return;
+    const wigRef = doc(firestore, 'products', wigId);
+    deleteDocumentNonBlocking(wigRef);
   }
 
   const handleNewImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -98,6 +105,30 @@ export default function AdminPage() {
     }
   };
 
+  const handleAddWig = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!productsCollectionRef) return;
+    const formData = new FormData(e.currentTarget);
+    const newWig = {
+      name: formData.get('name') as string,
+      price: parseFloat(formData.get('price') as string),
+      description: formData.get('description') as string,
+      imageIds: newWigImages.map(url => Math.random().toString(36).substring(7)), // Placeholder for image IDs
+      rating: 0,
+      reviewCount: 0,
+      isNew: true,
+      details: {
+        length: 'N/A',
+        color: 'N/A',
+        texture: 'N/A',
+        material: 'N/A',
+      },
+    };
+    addDocumentNonBlocking(productsCollectionRef, newWig);
+    e.currentTarget.reset();
+    setNewWigImages([]);
+  }
+
   return (
     <div className="container mx-auto px-4 py-8 md:py-16">
       <h1 className="text-3xl md:text-4xl font-headline font-bold mb-8">
@@ -108,70 +139,76 @@ export default function AdminPage() {
         {/* Add New Wig Form */}
         <div className="lg:col-span-1">
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <PlusCircle className="mr-2" />
-                Add New Wig
-              </CardTitle>
-              <CardDescription>
-                Fill out the details to add a new product to your catalog.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Wig Name</Label>
-                <Input id="name" placeholder="e.g., Classic Sleek Bob" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="price">Price</Label>
-                <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="price"
-                    type="number"
-                    placeholder="299.99"
-                    className="pl-8"
+            <form onSubmit={handleAddWig}>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <PlusCircle className="mr-2" />
+                  Add New Wig
+                </CardTitle>
+                <CardDescription>
+                  Fill out the details to add a new product to your catalog.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Wig Name</Label>
+                  <Input id="name" name="name" placeholder="e.g., Classic Sleek Bob" required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="price">Price</Label>
+                  <div className="relative">
+                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="price"
+                      name="price"
+                      type="number"
+                      placeholder="299.99"
+                      className="pl-8"
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea
+                    id="description"
+                    name="description"
+                    placeholder="A timeless classic..."
+                    required
                   />
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  placeholder="A timeless classic..."
-                />
-              </div>
-               <div className="space-y-2">
-                <Label htmlFor="images">Product Images</Label>
-                 <div className="relative flex justify-center items-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-secondary transition-colors" onClick={() => document.getElementById('images-upload')?.click()}>
-                    <Input id="images-upload" type="file" className="sr-only" multiple accept="image/*" onChange={handleNewImageUpload}/>
-                    <div className="text-center text-muted-foreground">
-                      <Upload className="mx-auto h-8 w-8" />
-                      <p className="mt-2 text-sm">Click or drag to upload</p>
-                    </div>
-                </div>
-                 {newWigImages.length > 0 && (
-                  <div className="grid grid-cols-3 gap-2 mt-2">
-                    {newWigImages.map((url, index) => (
-                      <div key={index} className="relative aspect-square">
-                        <Image src={url} alt={`New wig image ${index + 1}`} fill className="object-cover rounded-md" />
-                        <Button
-                          size="icon"
-                          variant="destructive"
-                          className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
-                          onClick={() => handleRemoveNewImage(url)}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
+                <div className="space-y-2">
+                  <Label htmlFor="images">Product Images</Label>
+                  <div className="relative flex justify-center items-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-secondary transition-colors" onClick={() => document.getElementById('images-upload')?.click()}>
+                      <Input id="images-upload" type="file" className="sr-only" multiple accept="image/*" onChange={handleNewImageUpload}/>
+                      <div className="text-center text-muted-foreground">
+                        <Upload className="mx-auto h-8 w-8" />
+                        <p className="mt-2 text-sm">Click or drag to upload</p>
                       </div>
-                    ))}
                   </div>
-                )}
-              </div>
-              <Button className="w-full">
-                <PlusCircle className="mr-2" /> Add Product
-              </Button>
-            </CardContent>
+                  {newWigImages.length > 0 && (
+                    <div className="grid grid-cols-3 gap-2 mt-2">
+                      {newWigImages.map((url, index) => (
+                        <div key={index} className="relative aspect-square">
+                          <Image src={url} alt={`New wig image ${index + 1}`} fill className="object-cover rounded-md" />
+                          <Button
+                            size="icon"
+                            variant="destructive"
+                            className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                            onClick={() => handleRemoveNewImage(url)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <Button className="w-full" type="submit">
+                  <PlusCircle className="mr-2" /> Add Product
+                </Button>
+              </CardContent>
+            </form>
           </Card>
         </div>
 
@@ -195,7 +232,8 @@ export default function AdminPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {wigs.map((wig) => (
+                    {isLoading && <tr><TableCell colSpan={3}>Loading...</TableCell></tr>}
+                    {wigs?.map((wig) => (
                       <TableRow key={wig.id}>
                         <TableCell className="font-medium">{wig.name}</TableCell>
                         <TableCell>${wig.price.toFixed(2)}</TableCell>

@@ -1,6 +1,6 @@
 'use client';
 import Image from 'next/image';
-import { reviews as allReviews } from '@/lib/data';
+import { wigs, reviews as allReviews } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -14,40 +14,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
-import { doc } from 'firebase/firestore';
-import type { Wig } from '@/lib/types';
-import { Skeleton } from '@/components/ui/skeleton';
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
-  const firestore = useFirestore();
-  const productDocRef = useMemoFirebase(() => firestore ? doc(firestore, 'products', params.id) : null, [firestore, params.id]);
-  const { data: wig, isLoading } = useDoc<Wig>(productDocRef);
-
-  if (isLoading) {
-    return (
-        <div className="container mx-auto px-4 py-8 md:py-16">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                <div>
-                    <Skeleton className="aspect-square w-full rounded-lg mb-4"/>
-                    <div className="grid grid-cols-4 gap-4">
-                        <Skeleton className="aspect-square w-full rounded-lg"/>
-                        <Skeleton className="aspect-square w-full rounded-lg"/>
-                        <Skeleton className="aspect-square w-full rounded-lg"/>
-                        <Skeleton className="aspect-square w-full rounded-lg"/>
-                    </div>
-                </div>
-                <div className="space-y-6">
-                    <Skeleton className="h-10 w-3/4"/>
-                    <Skeleton className="h-6 w-1/4"/>
-                    <Skeleton className="h-12 w-1/2"/>
-                    <Skeleton className="h-24 w-full"/>
-                    <Skeleton className="h-12 w-full"/>
-                </div>
-            </div>
-        </div>
-    )
-  }
+  const wig = wigs.find((w) => w.id === params.id);
 
   if (!wig) {
     notFound();

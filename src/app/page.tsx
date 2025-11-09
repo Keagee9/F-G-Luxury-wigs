@@ -3,21 +3,16 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { blogPosts, PlaceHolderImages } from '@/lib/data';
+import { blogPosts, PlaceHolderImages, wigs as initialWigs } from '@/lib/data';
 import { ProductCard } from '@/components/shared/ProductCard';
 import { ArrowRight } from 'lucide-react';
-import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection } from 'firebase/firestore';
+import { useState } from 'react';
 import type { Wig } from '@/lib/types';
-import { Skeleton } from '@/components/ui/skeleton';
 
 
 export default function Home() {
-  const firestore = useFirestore();
-  const productsCollectionRef = useMemoFirebase(() => firestore ? collection(firestore, 'products') : null, [firestore]);
-  const { data: wigs, isLoading } = useCollection<Wig>(productsCollectionRef);
-
-  const featuredWigs = wigs ? wigs.slice(0, 3) : [];
+  const [wigs] = useState<Wig[]>(initialWigs);
+  const featuredWigs = wigs.slice(0, 3);
   const featuredPosts = blogPosts.slice(0, 2);
   const heroImage = PlaceHolderImages.find((img) => img.id === 'hero-1');
 
@@ -56,7 +51,6 @@ export default function Home() {
             Featured Wigs
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {isLoading && [...Array(3)].map((_, i) => <Skeleton key={i} className="h-[450px] w-full" />)}
             {featuredWigs.map((wig) => (
               <ProductCard key={wig.id} wig={wig} />
             ))}

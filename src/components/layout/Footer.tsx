@@ -3,11 +3,11 @@ import { Logo } from "@/components/shared/Logo";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-function SocialIcon({ children }: { children: React.ReactNode }) {
+function SocialIcon({ children, href }: { children: React.ReactNode, href: string }) {
   return (
-    <Link href="#" className="text-muted-foreground hover:text-primary transition-colors">
+    <a href={href} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors">
       {children}
-    </Link>
+    </a>
   );
 }
 
@@ -26,14 +26,25 @@ export function Footer() {
             <p className="text-muted-foreground text-sm">
               Elevating confidence with premium human hair wigs.
             </p>
+             <div className="flex space-x-4 mt-4">
+              <SocialIcon href="https://www.facebook.com/goodnessoluchi.abengowe?mibextid=wwXIfr&mibextid=wwXIfr">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+              </SocialIcon>
+              <SocialIcon href="https://www.tiktok.com/@fgluxuryhairs?_t=ZP-8xvqz1gkcwg&_r=1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16.5 6.5a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Z"/><path d="M16.5 6.5v9C16.5 18.33 14.33 21 12 21s-4.5-2.67-4.5-5.5v-1.5c0-3.33 2.67-5.5 5-5.5"/></svg>
+              </SocialIcon>
+              <SocialIcon href="https://wa.me/13234718770">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+              </SocialIcon>
+            </div>
           </div>
 
           <div>
             <h3 className="font-headline font-semibold mb-4">Shop</h3>
             <ul className="space-y-2 text-sm">
               <li><Link href="/products" className="text-muted-foreground hover:text-primary">All Wigs</Link></li>
-              <li><Link href="#" className="text-muted-foreground hover:text-primary">New Arrivals</Link></li>
-              <li><Link href="#" className="text-muted-foreground hover:text-primary">Best Sellers</Link></li>
+              <li><Link href="/products" className="text-muted-foreground hover:text-primary">New Arrivals</Link></li>
+              <li><Link href="/products" className="text-muted-foreground hover:text-primary">Best Sellers</Link></li>
             </ul>
           </div>
 
@@ -60,15 +71,7 @@ export function Footer() {
         <div className="mt-12 pt-8 border-t flex flex-col sm:flex-row justify-between items-center text-sm text-muted-foreground">
           <p>&copy; {new Date().getFullYear()} F&G Luxury wigs. All rights reserved.</p>
           <div className="flex space-x-4 mt-4 sm:mt-0">
-            <SocialIcon>
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
-            </SocialIcon>
-            <SocialIcon>
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg>
-            </SocialIcon>
-            <SocialIcon>
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 1.4 2.8 3.2 3 5.2-2.7-1.7-5.5-2.5-8.3-2.6.7-3.6-1-6.6-4.2-7.8-2.5-1-5.1.3-6.8 2.8.1-.1.3-.2.4-.3 1.1-1 2.5-1.5 4-1.3s2.8 1.1 3.5 2.5c.2.4.3.8.4 1.2.2 1.5.1 3-1.2 4.1-1.3 1.1-3 1.5-4.5 1.1-.3-.1-.6-.2-.8-.3C1.2 14 1 15.1 1 16.3c0 2.5 1 4.8 2.5 6.5C4.9 24.3 6.7 25 8.5 25c4.7 0 8.5-3.8 8.5-8.5 0-.6 0-1.2-.1-1.8 1.5-.9 2.9-2.1 4.1-3.6.3-.4.6-.8.8-1.2.2-1 .1-2.1-.5-3-.4-.7-1-1.3-1.7-1.8zm-5.7 6.1c-3.3 0-6-2.7-6-6s2.7-6 6-6 6 2.7 6 6-2.7 6-6 6z"></path></svg>
-            </SocialIcon>
+             {/* Icons moved to under the brand info */}
           </div>
         </div>
       </div>

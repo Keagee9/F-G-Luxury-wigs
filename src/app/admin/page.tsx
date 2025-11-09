@@ -30,7 +30,7 @@ import {
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import type { Wig } from '@/lib/types';
-import { PlusCircle, Edit, Trash2, DollarSign, Upload, X } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, DollarSign, Upload, X, ImagePlus } from 'lucide-react';
 import Image from 'next/image';
 import { useCollection, useFirestore, useMemoFirebase, addDocumentNonBlocking, updateDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase';
 import { collection, doc } from 'firebase/firestore';
@@ -43,15 +43,14 @@ export default function AdminPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [currentWig, setCurrentWig] = useState<Wig | null>(null);
   
-  const [newWigImages, setNewWigImages] = useState<string[]>([]);
-  const [editingImages, setEditingImages] = useState<string[]>([]);
+  const [newWigImageIds, setNewWigImageIds] = useState<string[]>([]);
+  const [editingImageIds, setEditingImageIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (currentWig) {
-      const imageUrls = currentWig.imageIds?.map(id => `https://picsum.photos/seed/${id}/600/600`) || [];
-      setEditingImages(imageUrls);
+      setEditingImageIds(currentWig.imageIds || []);
     } else {
-      setEditingImages([]);
+      setEditingImageIds([]);
     }
   }, [currentWig]);
 
@@ -64,21 +63,11 @@ export default function AdminPage() {
     if (!currentWig || !firestore) return;
     const wigRef = doc(firestore, 'products', currentWig.id);
     
-    // In a real app, you would handle file uploads and get new image IDs/URLs.
-    // For now, we'll extract seeds from picsum URLs or generate new random ones.
-    const updatedImageIds = editingImages.map(url => {
-        if (url.startsWith('https://picsum.photos/seed/')) {
-            return url.split('/')[4];
-        }
-        // For new blob URLs
-        return Math.random().toString(36).substring(2, 9);
-    });
-
     const updatedWigData = {
         name: currentWig.name,
         price: currentWig.price,
         description: currentWig.description,
-        imageIds: updatedImageIds,
+        imageIds: editingImageIds,
     };
 
     updateDocumentNonBlocking(wigRef, updatedWigData);
@@ -92,32 +81,22 @@ export default function AdminPage() {
     deleteDocumentNonBlocking(wigRef);
   }
 
-  const handleNewImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const files = Array.from(e.target.files);
-      const imageUrls = files.map(file => URL.createObjectURL(file));
-      setNewWigImages(prev => [...prev, ...imageUrls]);
-    }
+  const handleAddNewImage = () => {
+    const randomId = Math.random().toString(36).substring(2, 9);
+    setNewWigImageIds(prev => [...prev, randomId]);
   };
 
-  const handleRemoveNewImage = (imageUrl: string) => {
-    setNewWigImages(prev => prev.filter(url => url !== imageUrl));
-    URL.revokeObjectURL(imageUrl);
+  const handleRemoveNewImage = (idToRemove: string) => {
+    setNewWigImageIds(prev => prev.filter(id => id !== idToRemove));
   };
 
-  const handleEditingImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && currentWig) {
-      const files = Array.from(e.target.files);
-      const imageUrls = files.map(file => URL.createObjectURL(file));
-      setEditingImages(prev => [...prev, ...imageUrls]);
-    }
+  const handleAddEditingImage = () => {
+    const randomId = Math.random().toString(36).substring(2, 9);
+    setEditingImageIds(prev => [...prev, randomId]);
   };
 
-  const handleRemoveEditingImage = (imageUrl: string) => {
-    setEditingImages(prev => prev.filter(url => url !== imageUrl));
-    if (imageUrl.startsWith('blob:')) {
-      URL.revokeObjectURL(imageUrl);
-    }
+  const handleRemoveEditingImage = (idToRemove: string) => {
+    setEditingImageIds(prev => prev.filter(id => id !== idToRemove));
   };
 
   const handleAddWig = (e: React.FormEvent<HTMLFormElement>) => {
@@ -125,16 +104,13 @@ export default function AdminPage() {
     if (!productsCollectionRef) return;
     const formData = new FormData(e.currentTarget);
     
-    // Create random seeds for the new images
-    const imageIds = newWigImages.map(() => Math.random().toString(36).substring(2, 9));
-
     const newWigData = {
       name: formData.get('name') as string,
       price: parseFloat(formData.get('price') as string),
       description: formData.get('description') as string,
-      imageIds: imageIds, // Use the generated IDs
-      rating: 0,
-      reviewCount: 0,
+      imageIds: newWigImageIds,
+      rating: Math.round((Math.random() * 0.5 + 4.5) * 10) / 10, // 4.5 to 5.0
+      reviewCount: Math.floor(Math.random() * 100) + 1,
       isNew: true,
       details: {
         length: 'N/A',
@@ -145,8 +121,7 @@ export default function AdminPage() {
     };
     addDocumentNonBlocking(productsCollectionRef, newWigData);
     e.currentTarget.reset();
-    newWigImages.forEach(URL.revokeObjectURL);
-    setNewWigImages([]);
+    setNewWigImageIds([]);
   }
 
   return (
@@ -200,30 +175,28 @@ export default function AdminPage() {
                 </div>
                 <div className="space-y-2">
                   <Label>Product Images</Label>
-                  <div className="relative flex justify-center items-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-secondary transition-colors" onClick={() => document.getElementById('images-upload')?.click()}>
-                      <Input id="images-upload" type="file" className="sr-only" multiple accept="image/*" onChange={handleNewImageUpload}/>
-                      <div className="text-center text-muted-foreground">
-                        <Upload className="mx-auto h-8 w-8" />
-                        <p className="mt-2 text-sm">Click or drag to upload</p>
-                      </div>
-                  </div>
-                  {newWigImages.length > 0 && (
-                    <div className="grid grid-cols-3 gap-2 mt-2">
-                      {newWigImages.map((url, index) => (
-                        <div key={index} className="relative aspect-square">
-                          <Image src={url} alt={`New wig image ${index + 1}`} fill className="object-cover rounded-md" />
+                   <div className="grid grid-cols-3 gap-2">
+                      {newWigImageIds.map((id) => (
+                        <div key={id} className="relative aspect-square">
+                          <Image src={`https://picsum.photos/seed/${id}/600/600`} alt={`New wig image`} fill className="object-cover rounded-md" />
                           <Button
                             size="icon"
                             variant="destructive"
                             className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
-                            onClick={(e) => { e.stopPropagation(); handleRemoveNewImage(url); }}
+                            onClick={(e) => { e.stopPropagation(); handleRemoveNewImage(id); }}
                           >
                             <X className="h-4 w-4" />
                           </Button>
                         </div>
                       ))}
+                      <div 
+                       className="relative flex flex-col gap-2 justify-center items-center w-full aspect-square border-2 border-dashed rounded-lg cursor-pointer hover:bg-secondary transition-colors" 
+                       onClick={handleAddNewImage}
+                      >
+                        <ImagePlus className="h-8 w-8 text-muted-foreground" />
+                        <p className="text-xs text-muted-foreground">Add Image</p>
                     </div>
-                  )}
+                  </div>
                 </div>
                 <Button className="w-full" type="submit">
                   <PlusCircle className="mr-2" /> Add Product
@@ -340,28 +313,25 @@ export default function AdminPage() {
                 </Label>
                 <div className="col-span-3">
                   <div className="grid grid-cols-3 gap-2">
-                    {editingImages.map((url, index) => (
-                      <div key={index} className="relative aspect-square">
-                        <Image src={url} alt={`Editing image ${index + 1}`} fill className="object-cover rounded-md" />
+                    {editingImageIds.map((id) => (
+                      <div key={id} className="relative aspect-square">
+                        <Image src={`https://picsum.photos/seed/${id}/600/600`} alt={`Editing image`} fill className="object-cover rounded-md" />
                         <Button
                           size="icon"
                           variant="destructive"
                           className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
-                          onClick={() => handleRemoveEditingImage(url)}
+                          onClick={() => handleRemoveEditingImage(id)}
                         >
                           <X className="h-4 w-4" />
                         </Button>
                       </div>
                     ))}
                      <div 
-                       className="relative flex justify-center items-center w-full aspect-square border-2 border-dashed rounded-lg cursor-pointer hover:bg-secondary transition-colors" 
-                       onClick={() => document.getElementById('editing-images-upload')?.click()}
+                       className="relative flex flex-col justify-center items-center w-full aspect-square border-2 border-dashed rounded-lg cursor-pointer hover:bg-secondary transition-colors" 
+                       onClick={handleAddEditingImage}
                       >
-                        <Input id="editing-images-upload" type="file" className="sr-only" multiple accept="image/*" onChange={handleEditingImageUpload}/>
-                        <div className="text-center text-muted-foreground p-2">
-                          <Upload className="mx-auto h-6 w-6" />
-                          <p className="mt-1 text-xs">Add more</p>
-                        </div>
+                        <ImagePlus className="mx-auto h-6 w-6 text-muted-foreground" />
+                        <p className="mt-1 text-xs text-muted-foreground">Add Image</p>
                     </div>
                   </div>
                 </div>
@@ -379,5 +349,3 @@ export default function AdminPage() {
     </div>
   );
 }
-
-    

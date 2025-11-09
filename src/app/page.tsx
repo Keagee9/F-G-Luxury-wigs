@@ -79,7 +79,7 @@ export default function Home() {
                       <h3 className="font-headline text-xl font-semibold mb-2">Virtual Try-On</h3>
                       <p className="text-muted-foreground mb-4">Upload your photo and instantly see how our wigs look on you. It's the modern way to shop for hair.</p>
                       <Button asChild variant="link" className="p-0 h-auto text-primary">
-                        <Link href="/virtual-try-on">Try It Now <ArrowRight className="ml-2" /></Link>
+                        <Link href="/#">Try It Now <ArrowRight className="ml-2" /></Link>
                       </Button>
                     </div>
                   </CardContent>
@@ -93,7 +93,7 @@ export default function Home() {
                       <h3 className="font-headline text-xl font-semibold mb-2">Personalized Recommendations</h3>
                       <p className="text-muted-foreground mb-4">Answer a few questions and let our AI stylist suggest the perfect wigs for your face shape, skin tone, and style.</p>
                        <Button asChild variant="link" className="p-0 h-auto text-primary">
-                        <Link href="/recommendations">Get Recommendations <ArrowRight className="ml-2" /></Link>
+                        <Link href="/#">Get Recommendations <ArrowRight className="ml-2" /></Link>
                       </Button>
                     </div>
                   </CardContent>

@@ -6,13 +6,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth, useFirestore, setDocumentNonBlocking } from '@/firebase';
 import { useRouter } from 'next/navigation';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, AuthError } from 'firebase/auth';
 import { doc } from 'firebase/firestore';
+import { useToast } from '@/hooks/use-toast';
 
 export default function SignUpPage() {
   const auth = useAuth();
   const firestore = useFirestore();
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -39,6 +41,20 @@ export default function SignUpPage() {
           router.push('/account');
         }
       } catch (error) {
+        const authError = error as AuthError;
+        if (authError.code === 'auth/email-already-in-use') {
+          toast({
+            variant: "destructive",
+            title: "Sign-up failed",
+            description: "An account with this email address already exists.",
+          });
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Uh oh! Something went wrong.",
+            description: authError.message || "Could not create your account.",
+          });
+        }
         console.error('Error signing up:', error);
       }
     }

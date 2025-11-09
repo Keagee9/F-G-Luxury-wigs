@@ -76,9 +76,6 @@ export function Header() {
                         <NavLink {...link} className="text-lg"/>
                     </SheetClose>
                 ))}
-                 <SheetClose asChild>
-                    <Link href="/admin" className="text-lg text-muted-foreground font-medium transition-colors hover:text-primary">Admin</Link>
-                </SheetClose>
               </nav>
             </SheetContent>
           </Sheet>
@@ -92,7 +89,7 @@ export function Header() {
         </div>
 
         <div className="flex flex-1 items-center justify-end space-x-2">
-           <Button variant="ghost" size="icon" asChild className="hidden md:inline-flex">
+           <Button variant="ghost" size="icon" asChild className="hidden">
             <Link href="/admin">
               <Shield className="h-5 w-5" />
               <span className="sr-only">Admin</span>

@@ -88,7 +88,7 @@ export default function CheckoutPage() {
                     <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
                     <h1 className="text-2xl font-headline font-bold">Thank you for your order!</h1>
                     <p className="text-muted-foreground mt-2">
-                        Your order has been placed and is being processed. A confirmation has been sent to {shippingDetails.email}.
+                        Your order has been placed and is being processed. A confirmation will be sent to {shippingDetails.email} shortly.
                     </p>
                 </Card>
             </div>

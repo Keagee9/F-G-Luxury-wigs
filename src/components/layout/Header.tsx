@@ -20,6 +20,7 @@ const navLinks = [
   { href: "/recommendations", label: "Recommendations" },
   { href: "/blog", label: "Style Guide" },
   { href: "/booking", label: "Book Consultation" },
+  { href: "/contact", label: "Contact Us" },
 ];
 
 export function Header() {

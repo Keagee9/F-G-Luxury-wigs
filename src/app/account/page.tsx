@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
+import { useEffect } from 'react';
 
 const accountLinks = [
   { href: '/account/profile', icon: User, title: 'My Profile', description: 'View and edit your personal information.' },
@@ -29,6 +30,12 @@ export default function AccountPage() {
 
   const { data: userProfile } = useDoc<{ firstName: string }>(userDocRef);
 
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push('/login');
+    }
+  }, [isUserLoading, user, router]);
+
   const handleSignOut = () => {
     if (auth) {
       signOut(auth).then(() => {
@@ -37,13 +44,8 @@ export default function AccountPage() {
     }
   };
 
-  if (isUserLoading) {
+  if (isUserLoading || !user) {
     return <div>Loading...</div>;
-  }
-
-  if (!user) {
-    router.push('/login');
-    return null;
   }
 
   return (

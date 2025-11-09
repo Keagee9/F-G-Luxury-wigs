@@ -12,6 +12,7 @@ import { Logo } from "@/components/shared/Logo";
 import { Menu, ShoppingBag, User, Shield } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "./ThemeToggle";
 
 const navLinks = [
   { href: "/products", label: "Shop" },
@@ -95,6 +96,7 @@ export function Header() {
               <span className="sr-only">Admin</span>
             </Link>
           </Button>
+          <ThemeToggle />
           <Button variant="ghost" size="icon" asChild>
             <Link href="/account">
               <User className="h-5 w-5" />

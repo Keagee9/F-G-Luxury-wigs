@@ -15,18 +15,31 @@ const availableTimes = [
   "09:00 AM", "10:00 AM", "11:00 AM", "01:00 PM", "02:00 PM", "03:00 PM",
 ];
 
-type BookingStep = 'selection' | 'payment' | 'upload' | 'confirmed';
+type BookingStep = 'selection' | 'payment' | 'details' | 'confirmed';
 
+type UserDetails = {
+    name: string;
+    email: string;
+    phone: string;
+};
 
 export default function BookingPage() {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [step, setStep] = useState<BookingStep>('selection');
   const [receipt, setReceipt] = useState<File | null>(null);
+  const [userDetails, setUserDetails] = useState<UserDetails>({name: '', email: '', phone: ''});
 
   const handleDetailsSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (date && selectedTime) {
+      const form = e.target as HTMLFormElement;
+      const formData = new FormData(form);
+      setUserDetails({
+          name: formData.get('name') as string,
+          email: formData.get('email') as string,
+          phone: '', // Phone will be collected in the 'details' step
+      });
       setStep('payment');
     }
   };
@@ -37,13 +50,21 @@ export default function BookingPage() {
     }
   };
   
-  const handleConfirmBooking = () => {
-      // Here you would typically handle the receipt upload to a server
-      // For this UI-only version, we'll just proceed to confirmation
+  const handleConfirmBooking = (e: React.FormEvent) => {
+      e.preventDefault();
       if(receipt) {
+        // Here you would typically handle form submission and receipt upload
+        const form = e.target as HTMLFormElement;
+        const formData = new FormData(form);
+        console.log("Booking confirmed for:", {
+            ...userDetails,
+            phone: formData.get('phone') as string,
+            date,
+            selectedTime,
+            receipt,
+        });
         setStep('confirmed');
       } else {
-        // You might want to show a toast or alert here
         alert("Please upload a receipt to confirm your booking.");
       }
   }
@@ -52,6 +73,7 @@ export default function BookingPage() {
     setDate(new Date());
     setSelectedTime(null);
     setReceipt(null);
+    setUserDetails({name: '', email: '', phone: ''});
     setStep('selection');
   }
 
@@ -62,7 +84,7 @@ export default function BookingPage() {
                   <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4"/>
                   <h1 className="text-2xl font-headline font-bold">Booking Confirmed!</h1>
                   <p className="text-muted-foreground mt-2">
-                      Your virtual consultation for {date?.toLocaleDateString()} at {selectedTime} is booked. We've sent a confirmation to your email.
+                      Your virtual consultation for {date?.toLocaleDateString()} at {selectedTime} is booked. We've sent a confirmation to {userDetails.email}.
                   </p>
                    <Button onClick={resetBooking} className="mt-6 w-full">Book Another Appointment</Button>
               </Card>
@@ -70,7 +92,7 @@ export default function BookingPage() {
       )
   }
 
-  if (step === 'payment' || step === 'upload') {
+  if (step === 'payment') {
     return (
         <div className="container mx-auto px-4 py-8 md:py-16">
              <div className="max-w-2xl mx-auto">
@@ -93,36 +115,69 @@ export default function BookingPage() {
                         </Alert>
                          <p className="text-sm text-muted-foreground">A <strong className="text-primary">25% deposit</strong> is required to secure your booking. This will be applied to your total service cost.</p>
                         
-                         {step === 'payment' && (
-                             <Button onClick={() => setStep('upload')} className="w-full">
-                                I've Sent The Deposit, Proceed to Upload Receipt
-                            </Button>
-                         )}
-
-                        {step === 'upload' && (
-                            <div className="space-y-4 pt-4 border-t">
-                                 <h3 className="font-semibold text-lg">Upload Receipt</h3>
-                                 <div className="relative flex justify-center items-center w-full h-40 border-2 border-dashed rounded-lg cursor-pointer hover:bg-secondary transition-colors"
-                                      onClick={() => document.getElementById('receipt-upload')?.click()}>
-                                    <Input id="receipt-upload" type="file" className="sr-only" onChange={handleReceiptUpload} accept="image/*,.pdf" />
-                                    {receipt ? (
-                                        <p className="font-medium text-green-600">{receipt.name}</p>
-                                    ) : (
-                                        <div className="text-center text-muted-foreground">
-                                        <Upload className="mx-auto h-8 w-8" />
-                                        <p className="mt-2 text-sm">Click to upload your proof of payment</p>
-                                        </div>
-                                    )}
-                                </div>
-                                <Button onClick={handleConfirmBooking} className="w-full" disabled={!receipt}>
-                                    Confirm Booking
-                                </Button>
-                            </div>
-                        )}
+                         <Button onClick={() => setStep('details')} className="w-full">
+                            I've Sent The Deposit, Proceed to Upload Receipt
+                        </Button>
                         <p className="text-xs text-muted-foreground text-center">
                             For users who are not on WhatsApp, you can share your proof of payment and booking info to this Gmail address: goodnessabengowe8@gmail.com
                         </p>
                     </CardContent>
+                </Card>
+             </div>
+        </div>
+    )
+  }
+
+   if (step === 'details') {
+    return (
+        <div className="container mx-auto px-4 py-8 md:py-16">
+             <div className="max-w-2xl mx-auto">
+                 <Button variant="ghost" onClick={() => setStep('payment')} className="mb-4">
+                     <ArrowLeft className="mr-2 h-4 w-4" />
+                     Back
+                 </Button>
+                <Card>
+                    <form onSubmit={handleConfirmBooking}>
+                        <CardHeader>
+                            <CardTitle className="font-headline text-2xl">Final Step: Confirm Your Details</CardTitle>
+                            <CardDescription>Please provide your contact information and upload your payment receipt.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="full-name">Full Name</Label>
+                                <Input id="full-name" name="name" defaultValue={userDetails.name} placeholder="Your full name" required />
+                            </div>
+                             <div className="space-y-2">
+                                <Label htmlFor="phone">Phone Number</Label>
+                                <Input id="phone" name="phone" type="tel" placeholder="Your phone number" required />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="email-confirm">Email Address</Label>
+                                <Input id="email-confirm" name="email" type="email" defaultValue={userDetails.email} placeholder="Your email address" required />
+                            </div>
+                             <div className="space-y-2">
+                                <Label htmlFor="receipt-upload">Proof of Payment</Label>
+                                <div className="relative flex justify-center items-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-secondary transition-colors"
+                                      onClick={() => document.getElementById('receipt-upload-input')?.click()}>
+                                    <Input id="receipt-upload-input" type="file" className="sr-only" onChange={handleReceiptUpload} accept="image/*,.pdf" />
+                                    {receipt ? (
+                                        <p className="font-medium text-green-600 px-4 text-center">{receipt.name}</p>
+                                    ) : (
+                                        <div className="text-center text-muted-foreground">
+                                        <Upload className="mx-auto h-8 w-8" />
+                                        <p className="mt-2 text-sm">Upload a screenshot or photo of your Zelle payment confirmation.</p>
+                                        </div>
+                                    )}
+                                </div>
+                                {receipt === null && <p className="text-sm text-muted-foreground">No file chosen</p>}
+                            </div>
+                        </CardContent>
+                        <CardContent>
+                             <Button type="submit" className="w-full" disabled={!receipt}>
+                                Send Notification & Confirm Booking
+                            </Button>
+                        </CardContent>
+                    </form>
                 </Card>
              </div>
         </div>
@@ -174,11 +229,11 @@ export default function BookingPage() {
                  <h2 className="font-headline text-xl font-semibold mb-4 text-center">3. Your Details</h2>
                  <div className="space-y-2">
                     <Label htmlFor="name">Full Name</Label>
-                    <Input id="name" placeholder="Jane Doe" required/>
+                    <Input id="name" name="name" placeholder="Jane Doe" required defaultValue={userDetails.name}/>
                  </div>
                  <div className="space-y-2">
                     <Label htmlFor="email">Email Address</Label>
-                    <Input id="email" type="email" placeholder="jane@example.com" required/>
+                    <Input id="email" name="email" type="email" placeholder="jane@example.com" required defaultValue={userDetails.email}/>
                  </div>
                 <Button type="submit" className="w-full" disabled={!date || !selectedTime}>
                   Proceed to Payment for {date?.toLocaleDateString()} at {selectedTime}

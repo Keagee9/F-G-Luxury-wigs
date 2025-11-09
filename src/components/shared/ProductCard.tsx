@@ -5,14 +5,13 @@ import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { Wig } from "@/lib/types";
-import { PlaceHolderImages } from "@/lib/data";
 import { Star, ShoppingCart, Zap } from "lucide-react";
 import { Button } from "../ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { useAuth, useFirestore, useUser } from "@/firebase";
-import { collection, doc } from "firebase/firestore";
-import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
+import { useAuth, useFirestore, useUser, useMemoFirebase } from "@/firebase";
+import { collection, doc, query, where, getDocs } from "firebase/firestore";
+import { addDocumentNonBlocking, updateDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { useState } from "react";
 import {
   AlertDialog,
@@ -30,14 +29,19 @@ type ProductCardProps = {
 };
 
 export function ProductCard({ wig }: ProductCardProps) {
-  const productImage = PlaceHolderImages.find((img) => img.id === wig.imageIds[0]);
+  const productImage = {
+      imageUrl: wig.imageIds && wig.imageIds.length > 0 
+          ? `https://picsum.photos/seed/${wig.imageIds[0]}/600/600` 
+          : 'https://placehold.co/600x600',
+      imageHint: 'wig photo'
+  };
   const { toast } = useToast();
   const router = useRouter();
   const { user } = useUser();
   const firestore = useFirestore();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -47,22 +51,42 @@ export function ProductCard({ wig }: ProductCardProps) {
     }
 
     if (firestore) {
-      const cartCollectionRef = collection(firestore, 'users', user.uid, 'cart_items');
-      const newCartItem = {
-        productId: wig.id,
-        quantity: 1,
-        userId: user.uid,
-        name: wig.name,
-        price: wig.price,
-        imageUrl: productImage?.imageUrl || ''
-      };
-      addDocumentNonBlocking(cartCollectionRef, newCartItem);
-      toast({
-        title: "Added to Cart",
-        description: `${wig.name} has been added to your cart.`,
-      });
+        const cartCollectionRef = collection(firestore, 'users', user.uid, 'cart_items');
+        
+        // Check if the item already exists in the cart
+        const q = query(cartCollectionRef, where("productId", "==", wig.id));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+            // Item exists, update quantity
+            const existingCartItem = querySnapshot.docs[0];
+            const existingCartItemRef = doc(firestore, 'users', user.uid, 'cart_items', existingCartItem.id);
+            updateDocumentNonBlocking(existingCartItemRef, {
+                quantity: existingCartItem.data().quantity + 1
+            });
+             toast({
+                title: "Cart Updated",
+                description: `Quantity for ${wig.name} has been updated.`,
+            });
+        } else {
+            // Item does not exist, add new item
+            const newCartItem = {
+                productId: wig.id,
+                quantity: 1,
+                userId: user.uid,
+                name: wig.name,
+                price: wig.price,
+                imageUrl: productImage?.imageUrl || ''
+            };
+            addDocumentNonBlocking(cartCollectionRef, newCartItem);
+            toast({
+                title: "Added to Cart",
+                description: `${wig.name} has been added to your cart.`,
+            });
+        }
     }
   };
+
 
   const handlePurchase = (e: React.MouseEvent) => {
     e.stopPropagation();

@@ -3,16 +3,24 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { blogPosts, PlaceHolderImages, wigs as initialWigs } from '@/lib/data';
+import { blogPosts, PlaceHolderImages } from '@/lib/data';
 import { ProductCard } from '@/components/shared/ProductCard';
 import { ArrowRight } from 'lucide-react';
-import { useState } from 'react';
 import type { Wig } from '@/lib/types';
+import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { collection, limit, query } from 'firebase/firestore';
 
 
 export default function Home() {
-  const [wigs] = useState<Wig[]>(initialWigs);
-  const featuredWigs = wigs.slice(0, 3);
+  const firestore = useFirestore();
+  
+  const productsQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, 'products'), limit(3));
+  }, [firestore]);
+
+  const { data: featuredWigs } = useCollection<Wig>(productsQuery);
+
   const featuredPosts = blogPosts.slice(0, 2);
   const heroImage = PlaceHolderImages.find((img) => img.id === 'hero-1');
 
@@ -51,7 +59,7 @@ export default function Home() {
             Featured Wigs
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredWigs.map((wig) => (
+            {featuredWigs?.map((wig) => (
               <ProductCard key={wig.id} wig={wig} />
             ))}
           </div>

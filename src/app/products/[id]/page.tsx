@@ -1,12 +1,9 @@
 'use client';
 import Image from 'next/image';
-import { wigs, reviews as allReviews } from '@/lib/data';
-import { notFound } from 'next/navigation';
+import { reviews as allReviews } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Star, Truck, ShieldCheck, Plus, Minus } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
-import PlaceHolderImages from '@/lib/placeholder-images.json';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Accordion,
@@ -14,18 +11,43 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
+import { doc } from 'firebase/firestore';
+import type { Wig } from '@/lib/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
-  const wig = wigs.find((w) => w.id === params.id);
+  const firestore = useFirestore();
+  
+  const productDocRef = useMemoFirebase(() => {
+    if (!firestore || !params.id) return null;
+    return doc(firestore, 'products', params.id);
+  }, [firestore, params.id]);
 
-  if (!wig) {
-    notFound();
+  const { data: wig, isLoading } = useDoc<Wig>(productDocRef);
+
+  const reviews = allReviews.filter(review => review.wigId === params.id);
+
+  if (isLoading) {
+    return <ProductDetailSkeleton />;
   }
 
-  const productImages = wig.imageIds.map(id => PlaceHolderImages.find(img => img.id === id)).filter(Boolean);
+  if (!wig) {
+    return (
+        <div className="container mx-auto px-4 py-8 md:py-16 text-center">
+            <h1 className="text-3xl font-bold">Product not found.</h1>
+        </div>
+    )
+  }
+
+  const productImages = wig.imageIds?.map(id => ({
+      id,
+      imageUrl: `https://picsum.photos/seed/${id}/600/600`,
+      imageHint: 'wig photo'
+  })) || [];
+  
   const mainImage = productImages[0];
   const galleryImages = productImages.slice(1);
-  const reviews = allReviews.filter(review => review.wigId === wig.id);
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-16">
@@ -122,7 +144,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
         <h2 className="text-3xl font-headline font-bold mb-8">Customer Reviews</h2>
         <div className="space-y-8">
           {reviews.length > 0 ? reviews.map(review => {
-            const avatar = PlaceHolderImages.find(img => img.id.startsWith('avatar'));
+            const avatar = { imageUrl: 'https://picsum.photos/seed/avatar/100/100', imageHint: 'person avatar'};
             return (
               <div key={review.id} className="flex gap-4">
                 <Avatar>
@@ -148,4 +170,41 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
       </div>
     </div>
   );
+}
+
+
+function ProductDetailSkeleton() {
+  return (
+     <div className="container mx-auto px-4 py-8 md:py-16">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div>
+          <Skeleton className="aspect-square w-full rounded-lg mb-4" />
+          <div className="grid grid-cols-4 gap-4">
+            <Skeleton className="aspect-square w-full rounded-lg" />
+            <Skeleton className="aspect-square w-full rounded-lg" />
+            <Skeleton className="aspect-square w-full rounded-lg" />
+            <Skeleton className="aspect-square w-full rounded-lg" />
+          </div>
+        </div>
+        <div className="space-y-6">
+          <Skeleton className="h-10 w-3/4" />
+          <Skeleton className="h-6 w-1/2" />
+          <Skeleton className="h-12 w-1/4" />
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-5/6" />
+          </div>
+          <div className="flex items-center space-x-4">
+            <Skeleton className="h-12 w-32" />
+            <Skeleton className="h-12 flex-1" />
+          </div>
+           <div className="space-y-4 pt-6">
+            <Skeleton className="h-6 w-full" />
+            <Skeleton className="h-6 w-full" />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }

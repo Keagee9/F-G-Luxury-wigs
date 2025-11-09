@@ -1,7 +1,14 @@
+'use client';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { User, Heart, Package, LogOut } from 'lucide-react';
+import { useAuth, useUser } from '@/firebase';
+import { signOut } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
+import { useDoc, useMemoFirebase } from '@/firebase';
+import { doc } from 'firebase/firestore';
+import { useFirestore } from '@/firebase';
 
 const accountLinks = [
   { href: '/account/profile', icon: User, title: 'My Profile', description: 'View and edit your personal information.' },
@@ -10,14 +17,43 @@ const accountLinks = [
 ];
 
 export default function AccountPage() {
+  const auth = useAuth();
+  const router = useRouter();
+  const { user, isUserLoading } = useUser();
+  const firestore = useFirestore();
+
+  const userDocRef = useMemoFirebase(() => {
+    if (!user || !firestore) return null;
+    return doc(firestore, 'users', user.uid);
+  }, [user, firestore]);
+
+  const { data: userProfile } = useDoc<{ firstName: string }>(userDocRef);
+
+  const handleSignOut = () => {
+    if (auth) {
+      signOut(auth).then(() => {
+        router.push('/login');
+      });
+    }
+  };
+
+  if (isUserLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    router.push('/login');
+    return null;
+  }
+
   return (
     <div className="container mx-auto px-4 py-8 md:py-16">
       <div className="flex justify-between items-start mb-8">
         <div>
           <h1 className="text-3xl md:text-4xl font-headline font-bold">My Account</h1>
-          <p className="text-muted-foreground mt-2">Welcome back, Jane!</p>
+          <p className="text-muted-foreground mt-2">Welcome back, {userProfile?.firstName || ''}!</p>
         </div>
-        <Button variant="outline"><LogOut className="mr-2 h-4 w-4" />Sign Out</Button>
+        <Button variant="outline" onClick={handleSignOut}><LogOut className="mr-2 h-4 w-4" />Sign Out</Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

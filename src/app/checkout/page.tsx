@@ -1,6 +1,4 @@
-
-
-"use client";
+'use client';
 
 import { useState } from 'react';
 import Image from 'next/image';
@@ -8,17 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { wigs } from '@/lib/data';
-import PlaceHolderImages from '@/lib/placeholder-images.json';
 import { Lock, ArrowLeft, Upload, CheckCircle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-
-const cartItems = [
-  { ...wigs[0], quantity: 1 },
-  { ...wigs[1], quantity: 1 },
-];
-const total = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+import { useCollection, useFirestore, useUser, useMemoFirebase } from '@/firebase';
+import { collection } from 'firebase/firestore';
 
 type CheckoutStep = 'shipping' | 'payment' | 'details' | 'confirmed';
 
@@ -34,6 +26,24 @@ type ShippingDetails = {
 };
 
 export default function CheckoutPage() {
+    const { user } = useUser();
+    const firestore = useFirestore();
+
+    const cartCollectionRef = useMemoFirebase(() => {
+        if (!user || !firestore) return null;
+        return collection(firestore, 'users', user.uid, 'cart_items');
+    }, [user, firestore]);
+    
+    const { data: cartItems } = useCollection<{
+        productId: string;
+        quantity: number;
+        name: string;
+        price: number;
+        imageUrl: string;
+    }>(cartCollectionRef);
+
+    const total = cartItems?.reduce((acc, item) => acc + item.price * item.quantity, 0) || 0;
+
     const [step, setStep] = useState<CheckoutStep>('shipping');
     const [shippingDetails, setShippingDetails] = useState<ShippingDetails>({
         firstName: '',
@@ -73,7 +83,7 @@ export default function CheckoutPage() {
     const handleConfirmPurchase = (e: React.FormEvent) => {
         e.preventDefault();
         if (receipt) {
-            const productNames = cartItems.map(item => `${item.name} (x${item.quantity})`).join(', ');
+            const productNames = cartItems?.map(item => `${item.name} (x${item.quantity})`).join(', ') || 'N/A';
             const message = `New Purchase from F&G Luxury wigs:\n\n*Name:* ${shippingDetails.firstName} ${shippingDetails.lastName}\n*Email:* ${shippingDetails.email}\n*Phone:* ${shippingDetails.phone}\n*Address:* ${shippingDetails.address}, ${shippingDetails.city}, ${shippingDetails.state} ${shippingDetails.zip}\n*Products:* ${productNames}\n*Total:* $${total.toFixed(2)}`;
             const whatsappUrl = `https://wa.me/13234718770?text=${encodeURIComponent(message)}`;
             window.open(whatsappUrl, '_blank');
@@ -211,7 +221,7 @@ export default function CheckoutPage() {
                 </div>
                 <div className="sm:col-span-2 space-y-2">
                   <Label htmlFor="email">Email Address</Label>
-                  <Input id="email" name="email" type="email" placeholder="jane@example.com" required defaultValue={shippingDetails.email}/>
+                  <Input id="email" name="email" type="email" placeholder="jane@example.com" required defaultValue={shippingDetails.email || user?.email || ''}/>
                 </div>
                 <div className="sm:col-span-2 space-y-2">
                   <Label htmlFor="phone">Phone Number</Label>
@@ -230,13 +240,11 @@ export default function CheckoutPage() {
         <div className="bg-secondary/50 p-8 rounded-lg">
           <h2 className="text-2xl font-headline font-bold mb-6">Your Order</h2>
           <div className="space-y-4">
-            {cartItems.map(item => {
-              const image = PlaceHolderImages.find(img => img.id === item.imageIds[0]);
-              return (
+            {cartItems?.map(item => (
               <div key={item.id} className="flex justify-between items-center">
                 <div className="flex items-center gap-4">
                    <div className="relative h-16 w-16 rounded-md overflow-hidden flex-shrink-0">
-                    {image && <Image src={image.imageUrl} alt={item.name} fill className="object-cover" data-ai-hint={image.imageHint}/>}
+                    {item.imageUrl && <Image src={item.imageUrl} alt={item.name} fill className="object-cover" />}
                   </div>
                   <div>
                     <p className="font-semibold">{item.name}</p>
@@ -245,7 +253,7 @@ export default function CheckoutPage() {
                 </div>
                 <p className="font-medium">${(item.price * item.quantity).toFixed(2)}</p>
               </div>
-            )})}
+            ))}
           </div>
           <Separator className="my-6" />
           <div className="space-y-2">

@@ -63,10 +63,25 @@ export default function AdminPage() {
   const handleUpdateWig = () => {
     if (!currentWig || !firestore) return;
     const wigRef = doc(firestore, 'products', currentWig.id);
-    // This assumes editingImages contains URLs that can be parsed for seed IDs.
-    // In a real app, you would handle file uploads and get new image URLs.
-    const updatedImageIds = editingImages.map(url => url.split('/')[4]);
-    updateDocumentNonBlocking(wigRef, { ...currentWig, imageIds: updatedImageIds });
+    
+    // In a real app, you would handle file uploads and get new image IDs/URLs.
+    // For now, we'll extract seeds from picsum URLs or generate new random ones.
+    const updatedImageIds = editingImages.map(url => {
+        if (url.startsWith('https://picsum.photos/seed/')) {
+            return url.split('/')[4];
+        }
+        // For new blob URLs
+        return Math.random().toString(36).substring(2, 9);
+    });
+
+    const updatedWigData = {
+        name: currentWig.name,
+        price: currentWig.price,
+        description: currentWig.description,
+        imageIds: updatedImageIds,
+    };
+
+    updateDocumentNonBlocking(wigRef, updatedWigData);
     setIsEditing(false);
     setCurrentWig(null);
   };
@@ -109,11 +124,15 @@ export default function AdminPage() {
     e.preventDefault();
     if (!productsCollectionRef) return;
     const formData = new FormData(e.currentTarget);
-    const newWig = {
+    
+    // Create random seeds for the new images
+    const imageIds = newWigImages.map(() => Math.random().toString(36).substring(2, 9));
+
+    const newWigData = {
       name: formData.get('name') as string,
       price: parseFloat(formData.get('price') as string),
       description: formData.get('description') as string,
-      imageIds: newWigImages.map(url => Math.random().toString(36).substring(7)), // Placeholder for image IDs
+      imageIds: imageIds, // Use the generated IDs
       rating: 0,
       reviewCount: 0,
       isNew: true,
@@ -124,8 +143,9 @@ export default function AdminPage() {
         material: 'N/A',
       },
     };
-    addDocumentNonBlocking(productsCollectionRef, newWig);
+    addDocumentNonBlocking(productsCollectionRef, newWigData);
     e.currentTarget.reset();
+    newWigImages.forEach(URL.revokeObjectURL);
     setNewWigImages([]);
   }
 
@@ -163,6 +183,7 @@ export default function AdminPage() {
                       name="price"
                       type="number"
                       placeholder="299.99"
+                      step="0.01"
                       className="pl-8"
                       required
                     />
@@ -178,7 +199,7 @@ export default function AdminPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="images">Product Images</Label>
+                  <Label>Product Images</Label>
                   <div className="relative flex justify-center items-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-secondary transition-colors" onClick={() => document.getElementById('images-upload')?.click()}>
                       <Input id="images-upload" type="file" className="sr-only" multiple accept="image/*" onChange={handleNewImageUpload}/>
                       <div className="text-center text-muted-foreground">
@@ -195,7 +216,7 @@ export default function AdminPage() {
                             size="icon"
                             variant="destructive"
                             className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
-                            onClick={() => handleRemoveNewImage(url)}
+                            onClick={(e) => { e.stopPropagation(); handleRemoveNewImage(url); }}
                           >
                             <X className="h-4 w-4" />
                           </Button>
@@ -295,11 +316,23 @@ export default function AdminPage() {
                   <Input
                     id="edit-price"
                     type="number"
+                    step="0.01"
                     value={currentWig.price}
                     onChange={(e) => setCurrentWig({ ...currentWig, price: Number(e.target.value) })}
                     className="pl-8"
                   />
                 </div>
+              </div>
+              <div className="grid grid-cols-4 items-start gap-4">
+                <Label htmlFor="edit-description" className="text-right pt-2">
+                  Description
+                </Label>
+                <Textarea
+                  id="edit-description"
+                  value={currentWig.description}
+                  onChange={(e) => setCurrentWig({ ...currentWig, description: e.target.value })}
+                  className="col-span-3"
+                />
               </div>
                <div className="grid grid-cols-4 items-start gap-4">
                 <Label className="text-right pt-2">
@@ -346,3 +379,5 @@ export default function AdminPage() {
     </div>
   );
 }
+
+    

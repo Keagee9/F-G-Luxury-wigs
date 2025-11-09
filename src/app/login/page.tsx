@@ -17,7 +17,7 @@ export default function LoginPage() {
     const formData = new FormData(e.currentTarget);
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
-    if (email && password) {
+    if (auth && email && password) {
       initiateEmailSignIn(auth, email, password);
       router.push('/account');
     }
@@ -39,7 +39,7 @@ export default function LoginPage() {
                     <div className="grid gap-2">
                         <div className="flex items-center">
                             <Label htmlFor="password">Password</Label>
-                            <Link href="#" className="ml-auto inline-block text-sm underline">
+                            <Link href="/forgot-password" className="ml-auto inline-block text-sm underline">
                                 Forgot your password?
                             </Link>
                         </div>

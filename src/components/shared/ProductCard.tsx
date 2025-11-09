@@ -29,12 +29,26 @@ type ProductCardProps = {
 };
 
 export function ProductCard({ wig }: ProductCardProps) {
-  const productImage = {
-      imageUrl: wig.imageIds && wig.imageIds.length > 0 
-          ? `https://picsum.photos/seed/${wig.imageIds[0]}/600/600` 
-          : 'https://placehold.co/600x600',
-      imageHint: 'wig photo'
+  const getProductImage = () => {
+    if (wig.imageUrls && wig.imageUrls.length > 0) {
+      return {
+        imageUrl: wig.imageUrls[0],
+        imageHint: 'wig photo'
+      };
+    }
+    if (wig.imageIds && wig.imageIds.length > 0) {
+      return {
+        imageUrl: `https://picsum.photos/seed/${wig.imageIds[0]}/600/600`,
+        imageHint: 'wig photo'
+      };
+    }
+    return {
+      imageUrl: 'https://placehold.co/600x600',
+      imageHint: 'placeholder'
+    };
   };
+
+  const productImage = getProductImage();
   const { toast } = useToast();
   const router = useRouter();
   const { user } = useUser();

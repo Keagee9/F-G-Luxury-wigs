@@ -4,6 +4,7 @@ export type Wig = {
   price: number;
   description: string;
   imageIds: string[];
+  imageUrls?: string[];
   rating: number;
   reviewCount: number;
   isNew: boolean;

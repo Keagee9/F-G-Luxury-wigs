@@ -40,11 +40,25 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
     )
   }
 
-  const productImages = wig.imageIds?.map(id => ({
-      id,
-      imageUrl: `https://picsum.photos/seed/${id}/600/600`,
-      imageHint: 'wig photo'
-  })) || [];
+  const getProductImages = () => {
+    if (wig.imageUrls && wig.imageUrls.length > 0) {
+      return wig.imageUrls.map((url, index) => ({
+        id: `${wig.id}-${index}`,
+        imageUrl: url,
+        imageHint: 'wig photo'
+      }));
+    }
+    if (wig.imageIds && wig.imageIds.length > 0) {
+      return wig.imageIds.map(id => ({
+        id,
+        imageUrl: `https://picsum.photos/seed/${id}/600/600`,
+        imageHint: 'wig photo'
+      }));
+    }
+    return [];
+  };
+
+  const productImages = getProductImages();
   
   const mainImage = productImages[0];
   const galleryImages = productImages.slice(1);
@@ -55,7 +69,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
         {/* Image Gallery */}
         <div>
           <div className="relative aspect-square w-full overflow-hidden rounded-lg shadow-lg mb-4">
-            {mainImage && (
+            {mainImage ? (
               <Image
                 src={mainImage.imageUrl}
                 alt={wig.name}
@@ -64,7 +78,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                 data-ai-hint={mainImage.imageHint}
                 priority
               />
-            )}
+            ) : <div className="w-full h-full bg-secondary"/>}
           </div>
           <div className="grid grid-cols-4 gap-4">
             {galleryImages.map((image) => image && (

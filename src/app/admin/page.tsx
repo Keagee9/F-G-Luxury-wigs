@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -30,7 +30,7 @@ import {
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import type { Wig } from '@/lib/types';
-import { PlusCircle, Edit, Trash2, DollarSign, Upload, X, ImagePlus } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, DollarSign, X, ImagePlus } from 'lucide-react';
 import Image from 'next/image';
 import { useCollection, useFirestore, useMemoFirebase, addDocumentNonBlocking, updateDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase';
 import { collection, doc } from 'firebase/firestore';
@@ -43,16 +43,30 @@ export default function AdminPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [currentWig, setCurrentWig] = useState<Wig | null>(null);
   
-  const [newWigImageIds, setNewWigImageIds] = useState<string[]>([]);
-  const [editingImageIds, setEditingImageIds] = useState<string[]>([]);
+  const [newWigImageUrls, setNewWigImageUrls] = useState<string[]>([]);
+  const [editingImageUrls, setEditingImageUrls] = useState<string[]>([]);
+  
+  const newImageInputRef = useRef<HTMLInputElement>(null);
+  const editImageInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (currentWig) {
-      setEditingImageIds(currentWig.imageIds || []);
+      setEditingImageUrls(currentWig.imageUrls || []);
     } else {
-      setEditingImageIds([]);
+      setEditingImageUrls([]);
     }
   }, [currentWig]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<string[]>>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setter(prev => [...prev, reader.result as string]);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleEditClick = (wig: Wig) => {
     setCurrentWig({ ...wig });
@@ -67,7 +81,7 @@ export default function AdminPage() {
         name: currentWig.name,
         price: currentWig.price,
         description: currentWig.description,
-        imageIds: editingImageIds,
+        imageUrls: editingImageUrls,
     };
 
     updateDocumentNonBlocking(wigRef, updatedWigData);
@@ -81,22 +95,12 @@ export default function AdminPage() {
     deleteDocumentNonBlocking(wigRef);
   }
 
-  const handleAddNewImage = () => {
-    const randomId = Math.random().toString(36).substring(2, 9);
-    setNewWigImageIds(prev => [...prev, randomId]);
+  const handleRemoveNewImage = (urlToRemove: string) => {
+    setNewWigImageUrls(prev => prev.filter(url => url !== urlToRemove));
   };
 
-  const handleRemoveNewImage = (idToRemove: string) => {
-    setNewWigImageIds(prev => prev.filter(id => id !== idToRemove));
-  };
-
-  const handleAddEditingImage = () => {
-    const randomId = Math.random().toString(36).substring(2, 9);
-    setEditingImageIds(prev => [...prev, randomId]);
-  };
-
-  const handleRemoveEditingImage = (idToRemove: string) => {
-    setEditingImageIds(prev => prev.filter(id => id !== idToRemove));
+  const handleRemoveEditingImage = (urlToRemove: string) => {
+    setEditingImageUrls(prev => prev.filter(url => url !== urlToRemove));
   };
 
   const handleAddWig = (e: React.FormEvent<HTMLFormElement>) => {
@@ -108,7 +112,8 @@ export default function AdminPage() {
       name: formData.get('name') as string,
       price: parseFloat(formData.get('price') as string),
       description: formData.get('description') as string,
-      imageIds: newWigImageIds,
+      imageUrls: newWigImageUrls,
+      imageIds: [], // Keep this for compatibility if needed, but we'll use imageUrls
       rating: Math.round((Math.random() * 0.5 + 4.5) * 10) / 10, // 4.5 to 5.0
       reviewCount: Math.floor(Math.random() * 100) + 1,
       isNew: true,
@@ -121,7 +126,7 @@ export default function AdminPage() {
     };
     addDocumentNonBlocking(productsCollectionRef, newWigData);
     e.currentTarget.reset();
-    setNewWigImageIds([]);
+    setNewWigImageUrls([]);
   }
 
   return (
@@ -175,15 +180,16 @@ export default function AdminPage() {
                 </div>
                 <div className="space-y-2">
                   <Label>Product Images</Label>
+                  <Input type="file" accept="image/*" className="hidden" ref={newImageInputRef} onChange={(e) => handleFileChange(e, setNewWigImageUrls)} />
                    <div className="grid grid-cols-3 gap-2">
-                      {newWigImageIds.map((id) => (
-                        <div key={id} className="relative aspect-square">
-                          <Image src={`https://picsum.photos/seed/${id}/600/600`} alt={`New wig image`} fill className="object-cover rounded-md" />
+                      {newWigImageUrls.map((url, index) => (
+                        <div key={index} className="relative aspect-square">
+                          <Image src={url} alt={`New wig image`} fill className="object-cover rounded-md" />
                           <Button
                             size="icon"
                             variant="destructive"
                             className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
-                            onClick={(e) => { e.stopPropagation(); handleRemoveNewImage(id); }}
+                            onClick={(e) => { e.stopPropagation(); handleRemoveNewImage(url); }}
                           >
                             <X className="h-4 w-4" />
                           </Button>
@@ -191,7 +197,7 @@ export default function AdminPage() {
                       ))}
                       <div 
                        className="relative flex flex-col gap-2 justify-center items-center w-full aspect-square border-2 border-dashed rounded-lg cursor-pointer hover:bg-secondary transition-colors" 
-                       onClick={handleAddNewImage}
+                       onClick={() => newImageInputRef.current?.click()}
                       >
                         <ImagePlus className="h-8 w-8 text-muted-foreground" />
                         <p className="text-xs text-muted-foreground">Add Image</p>
@@ -312,15 +318,16 @@ export default function AdminPage() {
                   Images
                 </Label>
                 <div className="col-span-3">
+                   <Input type="file" accept="image/*" className="hidden" ref={editImageInputRef} onChange={(e) => handleFileChange(e, setEditingImageUrls)} />
                   <div className="grid grid-cols-3 gap-2">
-                    {editingImageIds.map((id) => (
-                      <div key={id} className="relative aspect-square">
-                        <Image src={`https://picsum.photos/seed/${id}/600/600`} alt={`Editing image`} fill className="object-cover rounded-md" />
+                    {editingImageUrls.map((url, index) => (
+                      <div key={index} className="relative aspect-square">
+                        <Image src={url} alt={`Editing image`} fill className="object-cover rounded-md" />
                         <Button
                           size="icon"
                           variant="destructive"
                           className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
-                          onClick={() => handleRemoveEditingImage(id)}
+                          onClick={() => handleRemoveEditingImage(url)}
                         >
                           <X className="h-4 w-4" />
                         </Button>
@@ -328,7 +335,7 @@ export default function AdminPage() {
                     ))}
                      <div 
                        className="relative flex flex-col justify-center items-center w-full aspect-square border-2 border-dashed rounded-lg cursor-pointer hover:bg-secondary transition-colors" 
-                       onClick={handleAddEditingImage}
+                       onClick={() => editImageInputRef.current?.click()}
                       >
                         <ImagePlus className="mx-auto h-6 w-6 text-muted-foreground" />
                         <p className="mt-1 text-xs text-muted-foreground">Add Image</p>

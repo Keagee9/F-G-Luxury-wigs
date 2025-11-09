@@ -16,8 +16,6 @@ import { ThemeToggle } from "./ThemeToggle";
 
 const navLinks = [
   { href: "/products", label: "Shop" },
-  { href: "/virtual-try-on", label: "Virtual Try-On" },
-  { href: "/recommendations", label: "Recommendations" },
   { href: "/blog", label: "Style Guide" },
   { href: "/purchase-consultation", label: "Purchase Consultation" },
   { href: "/contact", label: "Contact Us" },

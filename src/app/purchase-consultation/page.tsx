@@ -53,16 +53,21 @@ export default function BookingPage() {
   const handleConfirmPurchase = (e: React.FormEvent) => {
       e.preventDefault();
       if(receipt) {
-        // Here you would typically handle form submission and receipt upload
         const form = e.target as HTMLFormElement;
         const formData = new FormData(form);
-        console.log("Purchase confirmed for:", {
-            ...userDetails,
+        const finalUserDetails = {
+            name: formData.get('name') as string,
+            email: formData.get('email') as string,
             phone: formData.get('phone') as string,
-            date,
-            selectedTime,
-            receipt,
-        });
+        };
+
+        const message = `New Consultation Purchase:%0A%0A*Name:* ${finalUserDetails.name}%0A*Email:* ${finalUserDetails.email}%0A*Phone:* ${finalUserDetails.phone}%0A*Date:* ${date?.toLocaleDateString()}%0A*Time:* ${selectedTime}`;
+        
+        const whatsappUrl = `https://wa.me/13234718770?text=${message}`;
+
+        window.open(whatsappUrl, '_blank');
+        
+        setUserDetails(finalUserDetails);
         setStep('confirmed');
       } else {
         alert("Please upload a receipt to confirm your purchase.");

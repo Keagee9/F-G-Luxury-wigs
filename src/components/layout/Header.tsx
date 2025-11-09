@@ -19,7 +19,7 @@ const navLinks = [
   { href: "/virtual-try-on", label: "Virtual Try-On" },
   { href: "/recommendations", label: "Recommendations" },
   { href: "/blog", label: "Style Guide" },
-  { href: "/booking", label: "Book Consultation" },
+  { href: "/purchase-consultation", label: "Purchase Consultation" },
   { href: "/contact", label: "Contact Us" },
 ];
 

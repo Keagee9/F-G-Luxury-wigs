@@ -133,6 +133,14 @@ export function Header() {
             </Link>
           </Button>
         </div>
+        <div className="md:hidden">
+          <Button variant="ghost" size="icon" asChild>
+            <Link href="/cart">
+              <ShoppingBag className="h-5 w-5" />
+              <span className="sr-only">Shopping Cart</span>
+            </Link>
+          </Button>
+        </div>
       </div>
     </header>
   );

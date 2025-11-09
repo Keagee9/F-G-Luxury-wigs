@@ -13,6 +13,7 @@ import { Menu, ShoppingBag, User, Shield } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./ThemeToggle";
+import { Separator } from "../ui/separator";
 
 const navLinks = [
   { href: "/products", label: "Shop" },
@@ -77,6 +78,26 @@ export function Header() {
                     </SheetClose>
                 ))}
               </nav>
+              <Separator className="my-6" />
+               <div className="flex items-center space-x-2">
+                 <ThemeToggle />
+                 <SheetClose asChild>
+                    <Button variant="ghost" size="icon" asChild>
+                        <Link href="/account">
+                        <User className="h-5 w-5" />
+                        <span className="sr-only">Account</span>
+                        </Link>
+                    </Button>
+                 </SheetClose>
+                  <SheetClose asChild>
+                    <Button variant="ghost" size="icon" asChild>
+                        <Link href="/cart">
+                        <ShoppingBag className="h-5 w-5" />
+                        <span className="sr-only">Shopping Cart</span>
+                        </Link>
+                    </Button>
+                  </SheetClose>
+               </div>
             </SheetContent>
           </Sheet>
         </div>
@@ -85,10 +106,13 @@ export function Header() {
         <div className="flex justify-center flex-1 md:hidden">
             <Link href="/" className="flex items-center space-x-2">
                 <Logo />
+                 <span className="font-bold sm:inline-block font-headline text-lg">
+                    F&G Luxury wigs
+                </span>
             </Link>
         </div>
 
-        <div className="flex flex-1 items-center justify-end space-x-2">
+        <div className="hidden md:flex flex-1 items-center justify-end space-x-2">
            <Button variant="ghost" size="icon" asChild className="hidden">
             <Link href="/admin">
               <Shield className="h-5 w-5" />

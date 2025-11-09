@@ -37,7 +37,12 @@ export default function LoginPage() {
                         <Input id="email" name="email" type="email" placeholder="m@example.com" required />
                     </div>
                     <div className="grid gap-2">
-                        <Label htmlFor="password">Password</Label>
+                        <div className="flex items-center">
+                            <Label htmlFor="password">Password</Label>
+                            <Link href="#" className="ml-auto inline-block text-sm underline">
+                                Forgot your password?
+                            </Link>
+                        </div>
                         <Input id="password" name="password" type="password" required />
                     </div>
                 </CardContent>

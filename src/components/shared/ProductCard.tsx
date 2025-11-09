@@ -9,6 +9,8 @@ import { PlaceHolderImages } from "@/lib/data";
 import { Star, ShoppingCart, Zap } from "lucide-react";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 type ProductCardProps = {
   wig: Wig;
@@ -16,6 +18,21 @@ type ProductCardProps = {
 
 export function ProductCard({ wig }: ProductCardProps) {
   const productImage = PlaceHolderImages.find((img) => img.id === wig.imageIds[0]);
+  const { toast } = useToast();
+  const router = useRouter();
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toast({
+      title: "Added to Cart",
+      description: `${wig.name} has been added to your cart.`,
+    });
+  };
+
+  const handlePurchase = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    router.push('/checkout');
+  };
 
   return (
     <Card className="h-full overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group">
@@ -38,10 +55,10 @@ export function ProductCard({ wig }: ProductCardProps) {
             <Badge className="absolute top-3 right-3 bg-accent text-accent-foreground">New</Badge>
           )}
            <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex justify-center gap-2">
-                <Button size="sm" variant="secondary" onClick={(e) => e.stopPropagation()}>
+                <Button size="sm" variant="secondary" onClick={handleAddToCart}>
                     <ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart
                 </Button>
-                <Button size="sm" onClick={(e) => e.stopPropagation()}>
+                <Button size="sm" onClick={handlePurchase}>
                     <Zap className="mr-2 h-4 w-4" /> Purchase
                 </Button>
             </div>

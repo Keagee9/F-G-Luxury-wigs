@@ -58,63 +58,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* AI Features Section */}
-      <section className="py-16 lg:py-24 bg-secondary">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="text-center lg:text-left">
-              <h2 className="text-3xl md:text-4xl font-headline font-bold mb-4">
-                Discover Your Perfect Match
-              </h2>
-              <p className="text-lg text-muted-foreground mb-8">
-                Our innovative AI tools make finding your next look easier and more personal than ever.
-              </p>
-              <div className="space-y-6">
-                <Card className="hover:shadow-lg transition-shadow">
-                  <CardContent className="p-6 flex items-start gap-4">
-                    <div className="p-3 bg-primary text-primary-foreground rounded-full">
-                       <Sparkles />
-                    </div>
-                    <div>
-                      <h3 className="font-headline text-xl font-semibold mb-2">Virtual Try-On</h3>
-                      <p className="text-muted-foreground mb-4">Upload your photo and instantly see how our wigs look on you. It's the modern way to shop for hair.</p>
-                      <Button asChild variant="link" className="p-0 h-auto text-primary">
-                        <Link href="/#">Try It Now <ArrowRight className="ml-2" /></Link>
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card className="hover:shadow-lg transition-shadow">
-                  <CardContent className="p-6 flex items-start gap-4">
-                    <div className="p-3 bg-primary text-primary-foreground rounded-full">
-                       <UserCheck />
-                    </div>
-                    <div>
-                      <h3 className="font-headline text-xl font-semibold mb-2">Personalized Recommendations</h3>
-                      <p className="text-muted-foreground mb-4">Answer a few questions and let our AI stylist suggest the perfect wigs for your face shape, skin tone, and style.</p>
-                       <Button asChild variant="link" className="p-0 h-auto text-primary">
-                        <Link href="/#">Get Recommendations <ArrowRight className="ml-2" /></Link>
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-            <div className="relative h-96 lg:h-[500px] rounded-lg overflow-hidden shadow-xl">
-               <Image
-                src="https://picsum.photos/seed/4/600/800"
-                alt="Woman trying on a wig"
-                fill
-                className="object-cover"
-                data-ai-hint="woman model"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Style Guide Section */}
-      <section className="py-16 lg:py-24 bg-background">
+      <section className="py-16 lg:py-24 bg-secondary">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-headline font-bold text-center mb-12">
             Your Guide to Effortless Style

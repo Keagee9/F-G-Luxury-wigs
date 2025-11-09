@@ -74,8 +74,8 @@ export default function CheckoutPage() {
         e.preventDefault();
         if (receipt) {
             const productNames = cartItems.map(item => `${item.name} (x${item.quantity})`).join(', ');
-            const message = `New Purchase from F&G Luxury wigs:%0A%0A*Name:* ${shippingDetails.firstName} ${shippingDetails.lastName}%0A*Email:* ${shippingDetails.email}%0A*Phone:* ${shippingDetails.phone}%0A*Address:* ${shippingDetails.address}, ${shippingDetails.city}, ${shippingDetails.state} ${shippingDetails.zip}%0A*Products:* ${productNames}%0A*Total:* $${total.toFixed(2)}`;
-            const whatsappUrl = `https://wa.me/13234718770?text=${message}`;
+            const message = `New Purchase from F&G Luxury wigs:\n\n*Name:* ${shippingDetails.firstName} ${shippingDetails.lastName}\n*Email:* ${shippingDetails.email}\n*Phone:* ${shippingDetails.phone}\n*Address:* ${shippingDetails.address}, ${shippingDetails.city}, ${shippingDetails.state} ${shippingDetails.zip}\n*Products:* ${productNames}\n*Total:* $${total.toFixed(2)}`;
+            const whatsappUrl = `https://wa.me/13234718770?text=${encodeURIComponent(message)}`;
             window.open(whatsappUrl, '_blank');
             setStep('confirmed');
         } else {

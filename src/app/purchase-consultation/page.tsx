@@ -61,9 +61,9 @@ export default function BookingPage() {
             phone: formData.get('phone') as string,
         };
 
-        const message = `New Consultation Purchase:%0A%0A*Name:* ${finalUserDetails.name}%0A*Email:* ${finalUserDetails.email}%0A*Phone:* ${finalUserDetails.phone}%0A*Date:* ${date?.toLocaleDateString()}%0A*Time:* ${selectedTime}`;
+        const message = `New Consultation Purchase:\n\n*Name:* ${finalUserDetails.name}\n*Email:* ${finalUserDetails.email}\n*Phone:* ${finalUserDetails.phone}\n*Date:* ${date?.toLocaleDateString()}\n*Time:* ${selectedTime}`;
         
-        const whatsappUrl = `https://wa.me/13234718770?text=${message}`;
+        const whatsappUrl = `https://wa.me/13234718770?text=${encodeURIComponent(message)}`;
 
         window.open(whatsappUrl, '_blank');
         

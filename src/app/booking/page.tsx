@@ -50,13 +50,13 @@ export default function BookingPage() {
     }
   };
   
-  const handleConfirmBooking = (e: React.FormEvent) => {
+  const handleConfirmPurchase = (e: React.FormEvent) => {
       e.preventDefault();
       if(receipt) {
         // Here you would typically handle form submission and receipt upload
         const form = e.target as HTMLFormElement;
         const formData = new FormData(form);
-        console.log("Booking confirmed for:", {
+        console.log("Purchase confirmed for:", {
             ...userDetails,
             phone: formData.get('phone') as string,
             date,
@@ -65,7 +65,7 @@ export default function BookingPage() {
         });
         setStep('confirmed');
       } else {
-        alert("Please upload a receipt to confirm your booking.");
+        alert("Please upload a receipt to confirm your purchase.");
       }
   }
 
@@ -137,7 +137,7 @@ export default function BookingPage() {
                      Back
                  </Button>
                 <Card>
-                    <form onSubmit={handleConfirmBooking}>
+                    <form onSubmit={handleConfirmPurchase}>
                         <CardHeader>
                             <CardTitle className="font-headline text-2xl">Final Step: Confirm Your Details</CardTitle>
                             <CardDescription>Please provide your contact information and upload your payment receipt.</CardDescription>
@@ -174,7 +174,7 @@ export default function BookingPage() {
                         </CardContent>
                         <CardContent>
                              <Button type="submit" className="w-full" disabled={!receipt}>
-                                Send Notification & Confirm Booking
+                                Send Notification & Confirm Purchase
                             </Button>
                         </CardContent>
                     </form>

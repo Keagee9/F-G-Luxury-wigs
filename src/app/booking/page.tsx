@@ -7,26 +7,55 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, Upload, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const availableTimes = [
   "09:00 AM", "10:00 AM", "11:00 AM", "01:00 PM", "02:00 PM", "03:00 PM",
 ];
 
+type BookingStep = 'selection' | 'payment' | 'upload' | 'confirmed';
+
+
 export default function BookingPage() {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [isBooked, setIsBooked] = useState(false);
+  const [step, setStep] = useState<BookingStep>('selection');
+  const [receipt, setReceipt] = useState<File | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleDetailsSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (date && selectedTime) {
-      setIsBooked(true);
+      setStep('payment');
+    }
+  };
+
+  const handleReceiptUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setReceipt(e.target.files[0]);
     }
   };
   
-  if (isBooked) {
+  const handleConfirmBooking = () => {
+      // Here you would typically handle the receipt upload to a server
+      // For this UI-only version, we'll just proceed to confirmation
+      if(receipt) {
+        setStep('confirmed');
+      } else {
+        // You might want to show a toast or alert here
+        alert("Please upload a receipt to confirm your booking.");
+      }
+  }
+
+  const resetBooking = () => {
+    setDate(new Date());
+    setSelectedTime(null);
+    setReceipt(null);
+    setStep('selection');
+  }
+
+  if (step === 'confirmed') {
       return (
           <div className="container mx-auto px-4 py-16 md:py-24 flex items-center justify-center">
               <Card className="max-w-md w-full text-center p-8">
@@ -35,10 +64,69 @@ export default function BookingPage() {
                   <p className="text-muted-foreground mt-2">
                       Your virtual consultation for {date?.toLocaleDateString()} at {selectedTime} is booked. We've sent a confirmation to your email.
                   </p>
-                   <Button onClick={() => setIsBooked(false)} className="mt-6 w-full">Book Another Appointment</Button>
+                   <Button onClick={resetBooking} className="mt-6 w-full">Book Another Appointment</Button>
               </Card>
           </div>
       )
+  }
+
+  if (step === 'payment' || step === 'upload') {
+    return (
+        <div className="container mx-auto px-4 py-8 md:py-16">
+             <div className="max-w-2xl mx-auto">
+                 <Button variant="ghost" onClick={() => setStep('selection')} className="mb-4">
+                     <ArrowLeft className="mr-2 h-4 w-4" />
+                     Back
+                 </Button>
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="font-headline text-2xl">Payment Instructions - Zelle Only</CardTitle>
+                        <CardDescription>Send Your Deposit via Zelle to confirm your appointment.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        <Alert>
+                            <AlertTitle className="font-semibold">Zelle Account Details</AlertTitle>
+                            <AlertDescription className="space-y-2 mt-2">
+                                <p><strong>Account Name:</strong> Goodness Abengowe</p>
+                                <p><strong>Account Number / Phone:</strong> (323) 471-8770</p>
+                            </AlertDescription>
+                        </Alert>
+                         <p className="text-sm text-muted-foreground">A <strong className="text-primary">25% deposit</strong> is required to secure your booking. This will be applied to your total service cost.</p>
+                        
+                         {step === 'payment' && (
+                             <Button onClick={() => setStep('upload')} className="w-full">
+                                I've Sent The Deposit, Proceed to Upload Receipt
+                            </Button>
+                         )}
+
+                        {step === 'upload' && (
+                            <div className="space-y-4 pt-4 border-t">
+                                 <h3 className="font-semibold text-lg">Upload Receipt</h3>
+                                 <div className="relative flex justify-center items-center w-full h-40 border-2 border-dashed rounded-lg cursor-pointer hover:bg-secondary transition-colors"
+                                      onClick={() => document.getElementById('receipt-upload')?.click()}>
+                                    <Input id="receipt-upload" type="file" className="sr-only" onChange={handleReceiptUpload} accept="image/*,.pdf" />
+                                    {receipt ? (
+                                        <p className="font-medium text-green-600">{receipt.name}</p>
+                                    ) : (
+                                        <div className="text-center text-muted-foreground">
+                                        <Upload className="mx-auto h-8 w-8" />
+                                        <p className="mt-2 text-sm">Click to upload your proof of payment</p>
+                                        </div>
+                                    )}
+                                </div>
+                                <Button onClick={handleConfirmBooking} className="w-full" disabled={!receipt}>
+                                    Confirm Booking
+                                </Button>
+                            </div>
+                        )}
+                        <p className="text-xs text-muted-foreground text-center">
+                            For users who are not on WhatsApp, you can share your proof of payment and booking info to this Gmail address: goodnessabengowe8@gmail.com
+                        </p>
+                    </CardContent>
+                </Card>
+             </div>
+        </div>
+    )
   }
 
   return (
@@ -63,7 +151,7 @@ export default function BookingPage() {
             />
           </div>
         </div>
-        <form onSubmit={handleSubmit} className="p-6">
+        <form onSubmit={handleDetailsSubmit} className="p-6">
           <div className="flex flex-col h-full">
             <div>
               <h2 className="font-headline text-xl font-semibold mb-4 text-center">2. Select a Time</h2>
@@ -93,7 +181,7 @@ export default function BookingPage() {
                     <Input id="email" type="email" placeholder="jane@example.com" required/>
                  </div>
                 <Button type="submit" className="w-full" disabled={!date || !selectedTime}>
-                  Book Appointment for {date?.toLocaleDateString()} at {selectedTime}
+                  Proceed to Payment for {date?.toLocaleDateString()} at {selectedTime}
                 </Button>
               </div>
             )}

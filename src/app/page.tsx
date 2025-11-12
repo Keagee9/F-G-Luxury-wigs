@@ -27,9 +27,9 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative h-[60vh] md:h-[80vh] w-full bg-primary/20">
-        <div className="container mx-auto px-4 h-full">
-          <div className="relative z-10 grid md:grid-cols-2 items-center h-full">
+      <section className="w-full bg-primary/20">
+        <div className="container mx-auto px-4">
+          <div className="grid md:grid-cols-2 items-center min-h-[60vh] md:min-h-[80vh] py-12 md:py-0">
             <div className="text-center md:text-left">
               <h1 className="font-headline text-4xl md:text-6xl lg:text-7xl font-bold drop-shadow-lg text-primary">
                 Find Your Signature Style
@@ -42,12 +42,10 @@ export default function Home() {
               </Button>
             </div>
             <div className="hidden md:flex relative w-full h-full items-center justify-center">
-               <Image
-                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAYFBMVEX///8BAQEAAAD8/Pz5+fn09PTw8PDk5OTW1tYwMDAICAgvLy8bGxvNzc3Y2Nje3t4pKSnExMS5ubkoKCgrKyt4eHixsbGgoKCSkpKenp5bW1uRkZGEhIRcXFxiYmJISEg4ODhUVFQ+Pj60h0g2AAABTklEQVR4nO3dy27CQBCF4WkVERAWBHkR8v8/L0cLZQUqgSR2spPZNTpntBy1TfIuA0EQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEFQl++s3v76odVabe3/fU6f2u115j/uB82fP/5xOszbPlvH123fP+/zfa/XmN80/2u069b+3af91/zO+c/H163fP8xPmq/XmD80PzO/2u12984//g/N78z/mu+b/zP+d/Pz8/O/8z/3B83/3B80/3N/0PzP/UFz/L8/bzqdlmvNf5z/vP/bNt/3+R/5gfP/GvPZ35nfNJ/3+d/5d+b7ff73/J/5P+f/zv/M/7v/Nf/n/t/8n/t/83/u/83/u/83/+/+f/z//a/5//d/8v/s/8//u/83/u/83/+/+f/z//a/5//d/8v/s/8//u/83/u/83/+/+f/z//a/5//d/8v/s/8//u/83/u/83/+/+f/z//a/5//d/8v/s/8//u/83/u/83/+/+T9FEARBEARBEARBEARBEARBEARBEARBEARBEARBUPd3tFkY4/i0bDQAAAAASUVORK5CYII="
+               <img
+                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAYFBMVEX///8BAQEAAAD8/Pz5+fn09PTw8PDk5OTW1tYwMDAICAgvLy8bGxvNzc3Y2Nje3t4pKSnExMS5ubkoKCgrKyt4eHixsbGgoKCSkpKenp5bW1uRkZGEhIRcXFxiYmJISEg4ODhUVFQ+Pj60h0g2AAABTklEQVR4nO3dy27CQBCF4WkVERAWBHkR8v8/L0cLZQUqgSR2spPZNTpntBy1TfIuA0EQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEEQBEFQl++s3v76odVabe3/fU6f2u115j/uB82fP/5xOszbPlvH123fP+/zfa/XmN80/2u069b+3af91/zO+c/H163fP8xPmq/XmD80PzO/2u12984//g/N78z/mu+b/zP+d/Pz8/O/8z/3B83/3B80/3N/0PzP/UFz/L8/bzqdlmvNf5z/vP/bNt/3+R/5gfP/GvPZ35nfNJ/3+d/5d+b7ff73/J/5P+f/zv/M/7v/Nf/n/t/8n/t/83/u/83/u/83/+/+f/z//a/5//d/8v/s/8//u/83/u/83/+/+f/z//a/5//d/8v/s/8//u/83/u/83/+/+f/z//a/5//d/8v/s/8//u/83/u/83/+/+T9FEARBEARBEARBEARBEARBEARBEARBEARBEARBUPd3tFkY4/i0bDQAAAAASUVORK5CYII="
                 alt="Brand Logo"
-                fill
-                className="object-contain"
-                data-ai-hint="logo company"
+                className="object-contain w-full h-full max-h-[50vh]"
               />
             </div>
           </div>
@@ -117,4 +115,3 @@ export default function Home() {
       </section>
     </div>
   );
-}

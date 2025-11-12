@@ -43,7 +43,7 @@ export default function Home() {
             </div>
             <div className="hidden md:flex relative w-full h-full items-center justify-center">
               <Image
-                src="/logo.png"
+                src="/f&g wig.png"
                 alt="Brand Logo"
                 width={500}
                 height={500}

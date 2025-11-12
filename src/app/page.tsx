@@ -24,12 +24,14 @@ export default function Home() {
 
   const featuredPosts = blogPosts.slice(0, 2);
   const heroImage = PlaceHolderImages.find((img) => img.id === 'hero-1');
+  const logoDataUri = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARAAAADACAYAAAD6Bv51AAABfGlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4KPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDIgNzkuMTYwOTI0LCAyMDE3LzA3LzEzLTAxOjA2OjM5ICAgICAgICAiPgogPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4KICA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIgogICAgeG1sbnM6cGhvdG9zaG9wPSJodHRwOi8vbnMuYWRvYmUuY29tL3Bob3Rvc2hvcC8xLjAvIgogICAgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIgogICAgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iCiAgIHBob3Rvc2hvcDpDb2xvck1vZGU9IjMiCiAgIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTggKFdpbmRvd3MpIgogICB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOmM4ZDg2ZTZiLWE2MjgtMDM0Ny1hZDk5LTYyZjkwNjAzZWI3ZCIKICAgZW5kb2M6ZW5kb2M9IkVORE9DIgp/Pg==";
 
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
       <section className="relative h-[60vh] md:h-[80vh] w-full bg-primary/20">
         <div className="relative z-10 flex h-full flex-col items-center justify-center text-center p-8">
+          <Image src={logoDataUri} alt="F&G Luxury Wigs Logo" width={150} height={150} className="mb-4" />
           <h1 className="font-headline text-4xl md:text-6xl lg:text-7xl font-bold drop-shadow-lg text-primary">
             Find Your Signature Style
           </h1>

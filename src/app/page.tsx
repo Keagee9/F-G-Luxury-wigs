@@ -9,7 +9,6 @@ import { ArrowRight } from 'lucide-react';
 import type { Wig } from '@/lib/types';
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { collection, limit, query } from 'firebase/firestore';
-import { Logo } from '@/components/shared/Logo';
 import PlaceHolderImages from '@/lib/placeholder-images.json';
 
 
@@ -29,24 +28,12 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative h-[60vh] md:h-[80vh] w-full">
-        {heroImage && (
-          <Image
-            src={heroImage.imageUrl}
-            alt={heroImage.description}
-            fill
-            className="object-cover object-top"
-            priority
-            data-ai-hint={heroImage.imageHint}
-          />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-        
-        <div className="relative z-10 flex h-full flex-col items-center justify-center text-center text-primary-foreground p-8">
-          <h1 className="font-headline text-4xl md:text-6xl lg:text-7xl font-bold drop-shadow-lg">
+      <section className="relative h-[60vh] md:h-[80vh] w-full bg-primary/20">
+        <div className="relative z-10 flex h-full flex-col items-center justify-center text-center p-8">
+          <h1 className="font-headline text-4xl md:text-6xl lg:text-7xl font-bold drop-shadow-lg text-primary">
             Find Your Signature Style
           </h1>
-          <p className="mt-4 max-w-2xl text-lg md:text-xl font-light drop-shadow-md">
+          <p className="mt-4 max-w-2xl text-lg md:text-xl font-light drop-shadow-md text-foreground">
             Experience the luxury of premium human hair wigs, tailored to your unique beauty.
           </p>
           <Button asChild size="lg" className="mt-8 bg-accent text-accent-foreground hover:bg-accent/90 transition-transform hover:scale-105">

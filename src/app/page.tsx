@@ -30,6 +30,15 @@ export default function Home() {
       <section className="w-full bg-primary/20">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 items-center min-h-[60vh] md:min-h-[80vh] py-12 md:py-0">
+             <div className="flex md:hidden relative w-full h-64 md:h-full items-center justify-center mb-8 md:mb-0">
+               <Image
+                src="/f&g wig.png"
+                alt="Brand Logo"
+                width={300}
+                height={300}
+                className="object-contain"
+              />
+            </div>
             <div className="text-center md:text-left">
               <h1 className="font-headline text-4xl md:text-6xl lg:text-7xl font-bold drop-shadow-lg text-primary">
                 Find Your Signature Style
@@ -41,8 +50,8 @@ export default function Home() {
                 <Link href="/products">Shop The Collection</Link>
               </Button>
             </div>
-            <div className="hidden md:flex relative w-full h-full items-center justify-center">
-              <Image
+             <div className="hidden md:flex relative w-full h-full items-center justify-center">
+               <Image
                 src="/f&g wig.png"
                 alt="Brand Logo"
                 width={500}

@@ -9,6 +9,7 @@ import { ArrowRight } from 'lucide-react';
 import type { Wig } from '@/lib/types';
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { collection, limit, query } from 'firebase/firestore';
+import { Logo } from '@/components/shared/Logo';
 
 
 export default function Home() {
@@ -41,13 +42,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         
         <div className="absolute top-4 right-4 z-20">
-          <Image
-            src="/logo-hero.png"
-            alt="F&G Luxury Wigs Logo"
-            width={150}
-            height={150}
-            className="w-24 h-24 md:w-32 md:h-32"
-          />
+          <Logo />
         </div>
 
         <div className="relative z-10 flex h-full flex-col items-center justify-end text-center text-primary-foreground p-8">

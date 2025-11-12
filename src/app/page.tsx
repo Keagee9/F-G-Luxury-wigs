@@ -3,13 +3,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { blogPosts, PlaceHolderImages } from '@/lib/data';
+import { blogPosts } from '@/lib/data';
 import { ProductCard } from '@/components/shared/ProductCard';
 import { ArrowRight } from 'lucide-react';
 import type { Wig } from '@/lib/types';
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { collection, limit, query } from 'firebase/firestore';
 import { Logo } from '@/components/shared/Logo';
+import PlaceHolderImages from '@/lib/placeholder-images.json';
 
 
 export default function Home() {
@@ -41,10 +42,6 @@ export default function Home() {
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         
-        <div className="absolute top-4 right-4 z-20">
-          <Logo />
-        </div>
-
         <div className="relative z-10 flex h-full flex-col items-center justify-end text-center text-primary-foreground p-8">
           <h1 className="font-headline text-4xl md:text-6xl lg:text-7xl font-bold drop-shadow-lg">
             Find Your Signature Style
